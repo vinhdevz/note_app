@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/register/register_screen.dart';
 import 'intro/intro_screen.dart';
 
 void main() {
@@ -15,14 +16,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: Colors.black,
-        fontFamily: 'Roboto',
+        fontFamily: 'Lato',
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.deepPurple,
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
       ),
-      home: const IntroScreen(),
+      home: IntroScreen(),
     );
   }
 }

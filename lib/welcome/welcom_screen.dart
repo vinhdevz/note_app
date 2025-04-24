@@ -14,7 +14,11 @@ class WelcomeScreen extends StatelessWidget {
         backgroundColor: tdBlack,
         elevation: 0,
         leading: IconButton(
+<<<<<<< HEAD
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+=======
+          icon: const Icon(Icons.arrow_back_ios, color: tdWhite),
+>>>>>>> 6c12871 (feat(register) : create register)
           onPressed: () {
             Navigator.pop(context);
           },
@@ -29,9 +33,16 @@ class WelcomeScreen extends StatelessWidget {
             const Text(
               'Welcome to UpTodo',
               style: TextStyle(
+<<<<<<< HEAD
                 color: Colors.white,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
+=======
+                color: tdWhite,
+                fontSize: 32,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Lato',
+>>>>>>> 6c12871 (feat(register) : create register)
               ),
               textAlign: TextAlign.center,
             ),
@@ -41,6 +52,11 @@ class WelcomeScreen extends StatelessWidget {
               style: TextStyle(
                 color: tdGrey,
                 fontSize: 16,
+<<<<<<< HEAD
+=======
+                fontWeight: FontWeight.w400,
+                fontFamily: 'Lato',
+>>>>>>> 6c12871 (feat(register) : create register)
               ),
               textAlign: TextAlign.center,
             ),
@@ -66,6 +82,10 @@ class WelcomeScreen extends StatelessWidget {
                     color: tdWhite,
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
+<<<<<<< HEAD
+=======
+                    fontFamily: 'Lato',
+>>>>>>> 6c12871 (feat(register) : create register)
                   ),
                 ),
               ),

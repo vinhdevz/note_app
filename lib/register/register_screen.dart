@@ -4,8 +4,6 @@ import 'package:flutter_todo_app/constants/color.dart';
 import 'package:flutter_todo_app/login/login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
-
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }

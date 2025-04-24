@@ -29,9 +29,27 @@ class _IntroScreenState extends State<IntroScreen> {
     return Scaffold(
       backgroundColor: tdBlack,
       body: Center(
+<<<<<<< HEAD
         child: SvgPicture.asset(
           'assets/images/logo.svg',
           width: 150,
+=======
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset('assets/images/logo2.svg', width: 150),
+            SizedBox(height: 20),
+            Text(
+              'UpTodo',
+              style: TextStyle(
+                color: tdWhite,
+                fontSize: 40,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Lato',
+              ),
+            ),
+          ],
+>>>>>>> 6c12871 (feat(register) : create register)
         ),
       ),
     );
