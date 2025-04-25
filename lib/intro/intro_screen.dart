@@ -29,11 +29,6 @@ class _IntroScreenState extends State<IntroScreen> {
     return Scaffold(
       backgroundColor: tdBlack,
       body: Center(
-<<<<<<< HEAD
-        child: SvgPicture.asset(
-          'assets/images/logo.svg',
-          width: 150,
-=======
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -49,7 +44,6 @@ class _IntroScreenState extends State<IntroScreen> {
               ),
             ),
           ],
->>>>>>> 6c12871 (feat(register) : create register)
         ),
       ),
     );

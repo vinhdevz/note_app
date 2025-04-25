@@ -115,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: [
                   Expanded(child: Divider(color: tdGrey2)),
                   Padding(
-                    padding: EdgeInsetsGeometry.symmetric(horizontal: 8),
+                    padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text('or', style: TextStyle(color: tdGrey2)),
                   ),
                   Expanded(child: Divider(color: tdGrey2)),
