@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todo_app/register/register_screen.dart';
 import 'intro/intro_screen.dart';
 
 void main() {
