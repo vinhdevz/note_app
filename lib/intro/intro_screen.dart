@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
-import 'package:flutter_todo_app/welcome/welcom_screen.dart';
+import 'package:flutter_todo_app/onboading/onboading_screen.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
@@ -18,7 +18,7 @@ class _IntroScreenState extends State<IntroScreen> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+          MaterialPageRoute(builder: (context) => const OnboardingScreen()),
         );
       }
     });

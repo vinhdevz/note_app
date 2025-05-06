@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/constants/color.dart';
-
 import '../login/login_screen.dart';
 
-class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({super.key});
+class StartScreen extends StatelessWidget {
+  const StartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +56,7 @@ class WelcomeScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: tdPurple,
+                  backgroundColor: tdDarkPurple,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -81,7 +80,7 @@ class WelcomeScreen extends StatelessWidget {
                 onPressed: () {
                 },
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: tdDarkpurple, width: 2),
+                  side: const BorderSide(color: tdDarkPurple, width: 2),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
