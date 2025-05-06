@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
 import 'package:flutter_todo_app/register/register_screen.dart';
-
+import 'package:flutter_todo_app/home/home_screen.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -104,7 +104,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (_formKey.currentState!.validate()) {
                       debugPrint('Username: ${usernameController.text}');
                       debugPrint('Password: ${passwordController.text}');
+                     Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(builder: (context) => const HomeScreen()),
+);
+
                     }
+                   
+                    
+                  
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: tdPurple,

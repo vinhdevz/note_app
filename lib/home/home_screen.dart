@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
-import 'package:flutter_todo_app/home/widgets/botton_bar.dart'; // Import file bottom bar
+import 'package:flutter_todo_app/home/widgets/botton_bar.dart'; 
 import 'package:flutter_todo_app/home/widgets/index_page.dart';
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+import 'package:flutter_todo_app/home/widgets/add_button.dart';
+import  'package:flutter_todo_app/home/widgets/addTask_screen.dart'; 
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<HomeScreen> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<HomeScreen> {
   int _currentIndex = 0;
   final List<String> _titles = ['Index', 'Calendar', 'Focus', 'Profile'];
-  List<String> tasks= [];
+  List<String> tasks = [];
+
   void _onTabSelected(int index) {
     setState(() {
       _currentIndex = index;
-      // Nếu bạn muốn đổi màn hình theo tab, xử lý ở đây
     });
   }
-   Widget _getCurrentPage() {
+
+  Widget _getCurrentPage() {
     switch (_currentIndex) {
       case 0:
         return IndexPage(tasks: tasks);
@@ -40,12 +43,13 @@ class _HomeState extends State<Home> {
     return Scaffold(
       backgroundColor: tdBgColor,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: tdBgColor,
         elevation: 0,
         title: Row(
           children: [
             SvgPicture.asset(
-              '/Users/admin/note_app/assets/icons/Home.svg',
+              'assets/icons/Home.svg',
               width: 42,
               height: 42,
             ),
@@ -62,29 +66,18 @@ class _HomeState extends State<Home> {
               ),
             ),
             const CircleAvatar(
-              backgroundImage: AssetImage('/Users/admin/note_app/assets/images/avatar.png'),
+              backgroundImage: AssetImage('assets/images/avatar.png'),
               radius: 21,
             ),
           ],
         ),
       ),
       body: _getCurrentPage(),
-      floatingActionButton: 
-      SizedBox(
-        height: 64,
-        width: 64,
-        child:FloatingActionButton(
-        backgroundColor: tdPurple,
+      floatingActionButton: FloatingAddButton(
         onPressed: () {
-          // Thêm action khi nhấn nút +
+          showAddTaskModal(context);
         },
-        shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(50), 
-    
-  ),
-        child: const Icon(Icons.add, size: 32, color: Colors.white),
-      ),),
-      
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomBar(
         currentIndex: _currentIndex,

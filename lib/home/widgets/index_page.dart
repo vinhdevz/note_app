@@ -18,7 +18,7 @@ class IndexPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset(
-                    '/Users/admin/note_app/assets/images/null.png', 
+                    'assets/images/empty.png', 
                     width: 227,
                   ),
                   const SizedBox(height: 18),
