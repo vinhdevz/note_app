@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
+import 'package:flutter_todo_app/database/user_db.dart';
 import 'package:flutter_todo_app/register/register_screen.dart';
 import 'package:flutter_todo_app/home/home_screen.dart';
 class LoginScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  bool rememberMe = false;
 
   @override
   Widget build(BuildContext context) {
@@ -22,16 +24,16 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         backgroundColor: tdBlack,
         elevation: 0,
-        leading: BackButtonCustom(),
+        leading: const BackButtonCustom(),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
-              SizedBox(height: 40),
-              Text(
+              const SizedBox(height: 40),
+              const Text(
                 'Login',
                 style: TextStyle(
                   fontSize: 32,
@@ -40,75 +42,81 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: tdWhite,
                 ),
               ),
-              SizedBox(height: 52),
-
-              Text('Username', 
-              style: 
-              TextStyle(color: tdWhite)),
-              SizedBox(height: 8),
+              const SizedBox(height: 52),
+              const Text('Username', style: TextStyle(color: tdWhite)),
+              const SizedBox(height: 8),
               TextFormField(
                 controller: usernameController,
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Username is required' : null,
                 decoration: InputDecoration(
                   hintText: 'Enter your Username',
-                  hintStyle: 
-                  TextStyle(color: tdGrey),
-                  enabledBorder: 
-                  OutlineInputBorder(
-                  borderSide: 
-                  BorderSide(color: tdGrey),
-                  ),
-                  focusedBorder:  
-                  OutlineInputBorder(
-                  borderSide: 
-                  BorderSide(color: tdPurple),
-                  ),
-                ),
-                style:  
-                TextStyle(color: tdWhite),
-              ),
-              SizedBox(height: 26),
-
-              Text('Password', 
-              style: 
-              TextStyle(color: tdWhite)),
-              SizedBox(height: 8),
-              TextFormField(
-                controller: passwordController,
-                obscureText: true,
-                validator: (value) => value == null || value.length < 6
-                    ? 'Password must be at least 6 characters'
-                    : null,
-                decoration: InputDecoration(
-                  hintText: 'Password',
-                  hintStyle: 
-                  TextStyle(color: tdGrey),
-                  enabledBorder: 
-                  OutlineInputBorder(
+                  hintStyle: const TextStyle(color: tdGrey),
+                  enabledBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: tdGrey),
                   ),
-                  focusedBorder: OutlineInputBorder(
+                  focusedBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: tdPurple),
                   ),
                 ),
-                style: 
-                TextStyle(color: tdWhite),
+                style: const TextStyle(color: tdWhite),
               ),
-              const SizedBox(height: 70),
-
+              const SizedBox(height: 26),
+              const Text('Password', style: TextStyle(color: tdWhite)),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: passwordController,
+                obscureText: true,
+                validator: (value) =>
+                    value == null || value.length < 6 ? 'Password must be at least 6 characters' : null,
+                decoration: InputDecoration(
+                  hintText: 'Password',
+                  hintStyle: const TextStyle(color: tdGrey),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: tdGrey),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: tdPurple),
+                  ),
+                ),
+                style: const TextStyle(color: tdWhite),
+              ),
+              CheckboxListTile(
+                title: const Text(
+                  'Ghi nhớ đăng nhập',
+                  style: TextStyle(color: tdWhite),
+                ),
+                value: rememberMe,
+                onChanged: (bool? value) {
+                  setState(() {
+                    rememberMe = value ?? false;
+                  });
+                },
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
+                activeColor: tdPurple,
+              ),
+              const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       debugPrint('Username: ${usernameController.text}');
                       debugPrint('Password: ${passwordController.text}');
-                     Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(builder: (context) => const HomeScreen()),
-);
 
+                      if (rememberMe) {
+                        await UserDatabase.instance.insertUser(
+                          usernameController.text,
+                          passwordController.text,
+                        );
+                      } else {
+                        await UserDatabase.instance.clearUser();
+                      }
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(builder: (context) => const Home()),
+                      // );
                     }
                    
                     
@@ -116,88 +124,72 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: tdPurple,
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: 
-                  Text('Login', 
-                  style: TextStyle(color: tdWhite)),
+                  child: const Text('Login', style: TextStyle(color: tdWhite)),
                 ),
               ),
-              SizedBox(height: 32),
-
+              const SizedBox(height: 32),
               Row(
-                children: [
-                  Expanded(
-                  child: 
-                  Divider(color: tdGrey2)),
+                children: const [
+                  Expanded(child: Divider(color: tdGrey2)),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: 
-                    Text('or', 
-                    style: TextStyle(color: tdGrey2)),
+                    child: Text('or', style: TextStyle(color: tdGrey2)),
                   ),
-                  Expanded(
-                    child:
-                    Divider(color: tdGrey2)),
+                  Expanded(child: Divider(color: tdGrey2)),
                 ],
               ),
-              SizedBox(height: 40),
-
+              const SizedBox(height: 40),
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: SvgPicture.asset('assets/icons/google.svg', width: 20),
-                label:
-                Text('Login with Google'),
-                style: 
-                OutlinedButton.styleFrom(
+                label: const Text('Login with Google'),
+                style: OutlinedButton.styleFrom(
                   foregroundColor: tdWhite,
-                  side: BorderSide(color: tdPurple),
-                  padding: EdgeInsets.symmetric(vertical: 14),
-                  minimumSize: Size.fromHeight(50),
+                  side: const BorderSide(color: tdPurple),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  minimumSize: const Size.fromHeight(50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-
+              const SizedBox(height: 20),
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: SvgPicture.asset('assets/icons/apple.svg', width: 20),
-                label: 
-                Text('Login with Apple'),
-                style: 
-                OutlinedButton.styleFrom(
+                label: const Text('Login with Apple'),
+                style: OutlinedButton.styleFrom(
                   foregroundColor: tdWhite,
-                  side: BorderSide(color: tdPurple),
-                  padding: EdgeInsets.symmetric(vertical: 14),
-                  minimumSize: Size.fromHeight(50),
+                  side: const BorderSide(color: tdPurple),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  minimumSize: const Size.fromHeight(50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
               ),
-              SizedBox(height: 46),
-
+              const SizedBox(height: 46),
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen()
-                    ),
-                    ); 
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RegisterScreen()),
+                    );
                   },
-                  child: Text.rich(
+                  child: const Text.rich(
                     TextSpan(
                       text: "Don't have an account? ",
-                      style:
-                      TextStyle(color: tdWhite),
+                      style: TextStyle(color: tdWhite),
                       children: [
                         TextSpan(
                           text: 'Register',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: tdWhite,
                             fontWeight: FontWeight.w400,
@@ -216,13 +208,14 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
 class BackButtonCustom extends StatelessWidget {
   const BackButtonCustom({super.key});
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.arrow_back_ios, color: tdWhite),
+      icon: const Icon(Icons.arrow_back_ios, color: tdWhite),
       onPressed: () => Navigator.pop(context),
     );
   }

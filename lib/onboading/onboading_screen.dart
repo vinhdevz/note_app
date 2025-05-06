@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/constants/color.dart';
-import 'package:flutter_todo_app/onboading/onboadingPage.dart';
-import 'package:flutter_todo_app/welcome/start_screen.dart';
+import 'package:flutter_todo_app/onboading/widget/onboadingPage.dart';
+import 'package:flutter_todo_app/welcome/welcome_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});

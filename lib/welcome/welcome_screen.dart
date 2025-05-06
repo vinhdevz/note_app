@@ -39,7 +39,7 @@ class StartScreen extends StatelessWidget {
             const Text(
               'Please login to your account or create new account to continue.',
               style: TextStyle(
-                color: tdGrey,
+                color: tdWhite,
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
                 fontFamily: 'Lato',
