@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/constants/color.dart';
 import '../login/login_screen.dart';
 
-class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({super.key});
+class StartScreen extends StatelessWidget {
+  const StartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
