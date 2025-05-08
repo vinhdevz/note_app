@@ -91,7 +91,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onPressed: _currentPage > 0
                       ? () {
                           _pageController.previousPage(
-                            duration: Duration(microseconds: 300),
+                            duration: Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
                           );
                         }
