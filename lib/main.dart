@@ -1,21 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'intro/intro_screen.dart';
+import 'package:flutter_todo_app/home/home_screen.dart';
+import 'package:flutter_todo_app/intro/intro_screen.dart'; 
+import 'package:flutter_todo_app/login/login_screen.dart';
+import 'package:flutter_todo_app/onboading/onboading_screen.dart';
+import 'package:flutter_todo_app/welcome/welcome_screen.dart'; 
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Nếu chạy trên desktop hoặc khi test, phải khởi tạo factory
-  if (!kIsWeb &&
-      (defaultTargetPlatform == TargetPlatform.windows ||
-          defaultTargetPlatform == TargetPlatform.linux ||
-          defaultTargetPlatform == TargetPlatform.macOS)) {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
-
   runApp(const MyApp());
 }
 
@@ -36,7 +27,14 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: IntroScreen(),
+      initialRoute: '/intro', 
+      routes: {
+        '/intro': (context) => const IntroScreen(),      
+        '/onboarding': (context) => const OnboardingScreen(), 
+        '/welcome': (context) => const StartScreen(),   
+        '/login': (context) => const LoginScreen(),       
+        '/home': (context) => const HomeScreen(),       
+      },
     );
   }
 }
