@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/constants/color.dart';
-import 'package:flutter_todo_app/database/user_db.dart';
-import 'package:flutter_todo_app/home/profile_screen.dart';
-import 'package:flutter_todo_app/home/widgets/botton_bar.dart';
+import 'package:flutter_todo_app/home/widgets/bottom_appbar.dart';
 import 'package:flutter_todo_app/home/widgets/index_page.dart';
 import 'package:flutter_todo_app/home/widgets/add_button.dart';
-import 'package:flutter_todo_app/home/widgets/addTask_screen.dart';
+import 'package:flutter_todo_app/home/widgets/add_task_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_todo_app/database/user_db.dart';
+
+
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,29 +42,18 @@ class _HomeState extends State<HomeScreen> {
     });
   }
 
-  void _addTask(String task) {
-    setState(() {
-      tasks.add(task);
-    });
-  }
+  
 
   Widget _getCurrentPage() {
     switch (_currentIndex) {
       case 0:
-        return IndexPage(tasks: tasks, addTaskCallback: _addTask);
+         return const IndexPage(); 
       case 1:
-        return const Center(
-            child: Text('Calendar Page', style: TextStyle(color: tdWhite)));
+        return const Center(child: Text('Calendar page', style: TextStyle(color: Colors.white)));
       case 2:
-        return const Center(
-            child: Text('Focus Page', style: TextStyle(color: tdWhite)));
+        return const Center(child: Text('Focus page', style: TextStyle(color: Colors.white)));
       case 3:
-        return ProfileScreen(
-          username: _username,
-          onLogout: () {
-            Navigator.pushReplacementNamed(context, '/login');
-          },
-        );
+        return const Center(child: Text('Profile page', style: TextStyle(color: Colors.white)));
       default:
         return const Center(
             child: Text('Page not found', style: TextStyle(color: tdWhite)));
@@ -76,13 +68,20 @@ class _HomeState extends State<HomeScreen> {
       body: _getCurrentPage(),
       floatingActionButton: FloatingAddButton(
         onPressed: () {
-          showAddTaskModal(context, (newTask) {
-            _addTask(newTask);
-          });
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: tdGrey,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+           builder: (context) => const AddTaskBottomSheet(),
+
+          );
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomBar(
+      bottomNavigationBar: BottomAppbar(
         currentIndex: _currentIndex,
         onTabSelected: _onTabSelected,
       ),

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
 
-class BottomBar extends StatelessWidget {
+class BottomAppbar extends StatelessWidget {
   final Function(int) onTabSelected;
   final int currentIndex;
 
-  const BottomBar({
+  const BottomAppbar({
     super.key,
     required this.onTabSelected,
     required this.currentIndex,

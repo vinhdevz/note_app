@@ -1,12 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
+import 'package:flutter_todo_app/models/task_model.dart';
+import 'package:flutter_todo_app/home/widgets/task_card.dart';
+import 'package:flutter_todo_app/database/task_database.dart';
+class IndexPage extends StatefulWidget {
+  const IndexPage({super.key});
 
-class IndexPage extends StatelessWidget {
-  final List<String> tasks;
-  final Function(String) addTaskCallback;
+  @override
+  
+ 
+  _IndexPageState createState() => _IndexPageState();
+}
 
-  const IndexPage({super.key, required this.tasks, required this.addTaskCallback});
+class _IndexPageState extends State<IndexPage> {
+  late Future<List<TaskModel>> _tasksFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _tasksFuture = TaskDatabase.instance.readAllTasks();
+  }
+
+  
+  void _loadTasks() {
+    setState(() {
+      _tasksFuture = TaskDatabase.instance.readAllTasks();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +44,7 @@ class IndexPage extends StatelessWidget {
               width: 42,
               height: 42,
             ),
-            Expanded(
+            const Expanded(
               child: Center(
                 child: Text(
                   'Index',
@@ -42,31 +63,32 @@ class IndexPage extends StatelessWidget {
           ],
         ),
       ),
-      body: tasks.isEmpty? 
       
-      _buildEmpty()
-        : ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: tasks.length,
-            itemBuilder: (context, index) {
-              return Card(
-                color: tdBlack,
-                margin: const EdgeInsets.only(bottom: 8),
-                child: ListTile(
-                  title: Text(
-                    tasks[index],
-                    style: const TextStyle(color: tdWhite, fontSize: 16),
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: tdPurple),
-                    onPressed: () {
-                    },
-                  ),
-                ),
-              );
-            },
-          )
-    ); 
+      body: FutureBuilder<List<TaskModel>>(
+        future: _tasksFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return _buildEmpty();
+          } else {
+            final tasks = snapshot.data!;
+            return ListView.builder(
+              padding: const EdgeInsets.only(top: 20),
+              itemCount: tasks.length,
+              itemBuilder: (context, index) {
+                return TaskCard(
+                  task: tasks[index],
+                  onDelete: _loadTasks,
+                );
+              },
+            );
+          }
+        },
+      ),
+    );
   }
 
   Widget _buildEmpty() {
