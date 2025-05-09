@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/home/home_screen.dart';
-import 'package:flutter_todo_app/intro/intro_screen.dart'; 
+import 'package:flutter_todo_app/home/profile_screen.dart';
+import 'package:flutter_todo_app/home/setting_screen.dart';
+import 'package:flutter_todo_app/intro/intro_screen.dart';
 import 'package:flutter_todo_app/login/login_screen.dart';
 import 'package:flutter_todo_app/onboading/onboading_screen.dart';
-import 'package:flutter_todo_app/welcome/welcome_screen.dart'; 
+import 'package:flutter_todo_app/welcome/welcome_screen.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -27,13 +29,24 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      initialRoute: '/intro', 
+      initialRoute: '/intro',
       routes: {
-        '/intro': (context) => const IntroScreen(),      
-        '/onboarding': (context) => const OnboardingScreen(), 
-        '/welcome': (context) => const StartScreen(),   
-        '/login': (context) => const LoginScreen(),       
-        '/home': (context) => const HomeScreen(),       
+        '/intro': (context) => const IntroScreen(),
+        '/onboarding': (context) => const OnboardingScreen(),
+        '/welcome': (context) => const StartScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/profile': (context) => ProfileScreen(
+              username: 'Dothanhvinh',
+              onLogout: () {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login', 
+                  (Route<dynamic> route) => false, 
+                );
+              },
+            ),
+        '/settings': (context) => const SettingScreen(),
       },
     );
   }
