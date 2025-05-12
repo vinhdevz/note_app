@@ -4,7 +4,7 @@ import 'package:flutter_todo_app/home/widgets/bottom_appbar.dart';
 import 'package:flutter_todo_app/home/widgets/index_page.dart';
 import 'package:flutter_todo_app/home/widgets/add_button.dart';
 import 'package:flutter_todo_app/home/widgets/add_task_screen.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
 import 'package:flutter_todo_app/database/user_db.dart';
 
 
@@ -18,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeState extends State<HomeScreen> {
+  final GlobalKey<IndexPageState> _indexPageKey = GlobalKey<IndexPageState>();
   int _currentIndex = 0;
   final List<String> _titles = ['Index', 'Calendar', 'Focus', 'Profile'];
   List<String> tasks = [];
@@ -47,7 +48,8 @@ class _HomeState extends State<HomeScreen> {
   Widget _getCurrentPage() {
     switch (_currentIndex) {
       case 0:
-         return const IndexPage(); 
+  return IndexPage(key: _indexPageKey);
+
       case 1:
         return const Center(child: Text('Calendar page', style: TextStyle(color: Colors.white)));
       case 2:
@@ -75,7 +77,12 @@ class _HomeState extends State<HomeScreen> {
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
-           builder: (context) => const AddTaskBottomSheet(),
+           builder: (context) => AddTaskBottomSheet(
+  onTaskAdded: () {
+    _indexPageKey.currentState?.loadTasks();
+  },
+),
+
 
           );
         },
