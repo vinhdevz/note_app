@@ -39,7 +39,7 @@ class _SelectPriorityDialogState extends State<SelectPriorityDialog> {
               'Task Priority',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
