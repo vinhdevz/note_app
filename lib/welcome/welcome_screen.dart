@@ -51,7 +51,7 @@ class StartScreen extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()
                   ),
                   );
                 },

@@ -21,22 +21,22 @@ class OnboardingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: tdBlack,
-      padding: EdgeInsets.symmetric(horizontal: 36),
+      padding: const EdgeInsets.symmetric(horizontal: 36),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(height: 40), 
+          const SizedBox(height: 40), 
           Image.asset(
             image,
             height: 350,
             width: 230,
           ),
-          SizedBox(height: 40), 
+          const SizedBox(height: 40), 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(3, (dotIndex) {
               return Container(
-                margin: EdgeInsets.symmetric(horizontal: 4),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
                 width: 20,
                 height: 4,
                 decoration: BoxDecoration(
@@ -46,29 +46,29 @@ class OnboardingPage extends StatelessWidget {
               );
             }),
           ),
-          SizedBox(height: 50),
+          const SizedBox(height: 50),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               color: tdWhite,
               fontSize: 32,
               fontFamily: 'Lato',
               fontWeight: FontWeight.w700,
             ),
           ),
-          SizedBox(height: 80), 
+          const SizedBox(height: 80), 
           Text(
             description,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               color: tdWhite,
               fontSize: 16,
               fontWeight: FontWeight.w400,
               fontFamily: 'Lato',
             ),
           ),
-          Spacer(), 
+          const Spacer(), 
         ],
       ),
     );

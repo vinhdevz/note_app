@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/database/user_db.dart';
 import 'package:flutter_todo_app/home/home_screen.dart';
 import 'package:flutter_todo_app/home/profile_screen.dart';
 import 'package:flutter_todo_app/home/setting_screen.dart';
@@ -9,11 +10,27 @@ import 'package:flutter_todo_app/onboading/onboading_screen.dart';
 import 'package:flutter_todo_app/welcome/welcome_screen.dart';
 
 void main() async {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  final savedData = await UserDatabase.instance.getSavedLogin();
+
+  String initialRoute;
+  if (savedData != null) {
+    final isValid = await UserDatabase.instance.checkLogin(
+      savedData['username']!,
+      savedData['password']!,
+    );
+    initialRoute = isValid ? '/home' : '/login';
+  } else {
+    initialRoute = '/intro';
+  }
+
+  runApp(MyApp(initialRoute: initialRoute));
 }
 
+
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+  const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +46,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      initialRoute: '/intro',
+      initialRoute: initialRoute,
       routes: {
         '/intro': (context) => const IntroScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
@@ -41,8 +58,8 @@ class MyApp extends StatelessWidget {
               onLogout: () {
                 Navigator.pushNamedAndRemoveUntil(
                   context,
-                  '/login', 
-                  (Route<dynamic> route) => false, 
+                  '/login',
+                  (Route<dynamic> route) => false,
                 );
               },
             ),

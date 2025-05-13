@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/constants/color.dart';
+import 'package:flutter_todo_app/home/profile_screen.dart';
 import 'package:flutter_todo_app/home/widgets/bottom_appbar.dart';
 import 'package:flutter_todo_app/home/widgets/index_page.dart';
 import 'package:flutter_todo_app/home/widgets/add_button.dart';
 import 'package:flutter_todo_app/home/widgets/add_task_screen.dart';
-
 import 'package:flutter_todo_app/database/user_db.dart';
-
-
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,18 +19,18 @@ class _HomeState extends State<HomeScreen> {
   int _currentIndex = 0;
   final List<String> _titles = ['Index', 'Calendar', 'Focus', 'Profile'];
   List<String> tasks = [];
-  String? _username;
+  String? _userName;
 
   @override
   void initState() {
     super.initState();
-    _loadUsername();
+    _loadUserName();
   }
 
-  Future<void> _loadUsername() async {
-    String? username = await UserDatabase.instance.getSavedLogin();
+  Future<void> _loadUserName() async {
+    final savedLogin = await UserDatabase.instance.getSavedLogin();
     setState(() {
-      _username = username ?? 'Guest';
+      _userName = savedLogin?['username'] ?? 'Guest';
     });
   }
 
@@ -43,22 +40,27 @@ class _HomeState extends State<HomeScreen> {
     });
   }
 
-  
-
   Widget _getCurrentPage() {
     switch (_currentIndex) {
       case 0:
-  return IndexPage(key: _indexPageKey);
-
+        return const IndexPage();
       case 1:
-        return const Center(child: Text('Calendar page', style: TextStyle(color: Colors.white)));
+        return const Center(
+          child: Text('Calendar page', style: TextStyle(color: Colors.white)),
+        );
       case 2:
-        return const Center(child: Text('Focus page', style: TextStyle(color: Colors.white)));
+        return const Center(
+          child: Text('Focus page', style: TextStyle(color: Colors.white)),
+        );
       case 3:
-        return const Center(child: Text('Profile page', style: TextStyle(color: Colors.white)));
+        return ProfileScreen(
+          username: _userName ?? 'Guest',
+          onLogout: _handleLogout,
+        );
       default:
         return const Center(
-            child: Text('Page not found', style: TextStyle(color: tdWhite)));
+          child: Text('Page not found', style: TextStyle(color: tdWhite)),
+        );
     }
   }
 
@@ -66,7 +68,6 @@ class _HomeState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: tdBgColor,
-     
       body: _getCurrentPage(),
       floatingActionButton: FloatingAddButton(
         onPressed: () {
@@ -77,13 +78,9 @@ class _HomeState extends State<HomeScreen> {
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
-           builder: (context) => AddTaskBottomSheet(
-  onTaskAdded: () {
-    _indexPageKey.currentState?.loadTasks();
-  },
-),
-
-
+            builder: (context) => AddTaskBottomSheet(
+              onTaskAdded: () {},
+            ),
           );
         },
       ),
@@ -93,5 +90,9 @@ class _HomeState extends State<HomeScreen> {
         onTabSelected: _onTabSelected,
       ),
     );
+  }
+
+  void _handleLogout() async {
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
 }

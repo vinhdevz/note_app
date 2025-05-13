@@ -33,8 +33,8 @@ class _IntroScreenState extends State<IntroScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SvgPicture.asset('assets/images/logo2.svg', width: 150),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'UpTodo',
               style: TextStyle(
                 color: tdWhite,

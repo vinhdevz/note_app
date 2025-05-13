@@ -22,7 +22,7 @@ class UserDatabase {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onDowngrade: _onDowngrade,
@@ -32,31 +32,33 @@ class UserDatabase {
   Future _createDB(Database db, int version) async {
     developer.log('Creating database with version: $version');
     await db.execute('''
-    CREATE TABLE users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT NOT NULL UNIQUE,
-      password TEXT NOT NULL
-    )
+      CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL
+      )
     ''');
 
     await db.execute('''
-    CREATE TABLE login_state (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT
-    )
+      CREATE TABLE login_state (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        password TEXT
+      )
     ''');
   }
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
     developer.log('Upgrading database from version $oldVersion to $newVersion');
-    if (oldVersion < 2) {
+    if (oldVersion < 3) {
+      await db.execute('DROP TABLE IF EXISTS login_state');
       await db.execute('''
-      CREATE TABLE IF NOT EXISTS login_state (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT
-      )
+        CREATE TABLE login_state (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          username TEXT,
+          password TEXT
+        )
       ''');
-      developer.log('Created login_state table');
     }
   }
 
@@ -67,25 +69,18 @@ class UserDatabase {
     await _createDB(db, newVersion);
   }
 
-  String _hashPassword(String password) {
-    return md5.convert(utf8.encode(password)).toString();
+  String _hashPassword(String passWord) {
+    return md5.convert(utf8.encode(passWord)).toString();
   }
 
-  Future<bool> insertUser(String username, String password) async {
+  Future<bool> insertUser(String userName, String passWord) async {
     final db = await database;
     try {
-      await db.execute('''
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL
-      )
-      ''');
       await db.insert(
         'users',
         {
-          'username': username,
-          'password': _hashPassword(password),
+          'username': userName,
+          'password': _hashPassword(passWord),
         },
         conflictAlgorithm: ConflictAlgorithm.fail,
       );
@@ -96,22 +91,25 @@ class UserDatabase {
     }
   }
 
-  Future<bool> checkLogin(String username, String password) async {
+  Future<bool> checkLogin(String userName, String passWord) async {
     final db = await database;
     final result = await db.query(
       'users',
       where: 'username = ? AND password = ?',
-      whereArgs: [username, _hashPassword(password)],
+      whereArgs: [userName, _hashPassword(passWord)],
     );
     return result.isNotEmpty;
   }
 
-  Future<void> saveLoginState(String username) async {
+  Future<void> saveLoginState(String userName, String passWord) async {
     final db = await database;
     await db.delete('login_state');
     await db.insert(
       'login_state',
-      {'username': username},
+      {
+        'username': userName,
+        'password': passWord,
+      },
     );
   }
 
@@ -120,17 +118,61 @@ class UserDatabase {
     await db.delete('login_state');
   }
 
-  Future<String?> getSavedLogin() async {
+  Future<Map<String, String>?> getSavedLogin() async {
     final db = await database;
     final result = await db.query('login_state');
     if (result.isNotEmpty) {
-      return result.first['username'] as String?;
+      final row = result.first;
+      return {
+        'username': row['username'] as String,
+        'password': row['password'] as String,
+      };
     }
     return null;
+  }
+
+  Future<void> updateUserName(String oldUserName, String newUserName) async {
+    final db = await database;
+    await db.update(
+      'users',
+      {'username': newUserName},
+      where: 'username = ?',
+      whereArgs: [oldUserName],
+    );
+    await db.update('login_state', {'username': newUserName},
+        where: 'username = ?', whereArgs: [oldUserName]);
   }
 
   Future close() async {
     final db = await database;
     db.close();
   }
+
+  Future<bool> updatePassWord({
+  required String userName,
+  required String oldPassWord,
+  required String newPassWord,
+}) async {
+  final db = await instance.database;
+
+  final hashedOldPass = _hashPassword(oldPassWord);
+  final hashedNewPass = _hashPassword(newPassWord);
+
+  final result = await db.query(
+    'users',
+    where: 'username = ? AND password = ?',
+    whereArgs: [userName, hashedOldPass], 
+  );
+
+  if (result.isNotEmpty) {
+    await db.update(
+      'users',
+      {'password': hashedNewPass}, 
+      where: 'username = ?',
+      whereArgs: [userName],
+    );
+    return true;
+  }
+  return false;
+}
 }
