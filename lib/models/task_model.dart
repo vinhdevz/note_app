@@ -1,9 +1,10 @@
 class TaskModel {
-  int? id; // ID tự tăng để lưu trong SQLite
+  int? id;
   final String title;
   final String description;
   final DateTime dateTime;
   final int priority;
+  final bool isCompleted; // ✅ Thêm trường này
 
   TaskModel({
     this.id,
@@ -11,9 +12,9 @@ class TaskModel {
     required this.description,
     required this.dateTime,
     required this.priority,
+    this.isCompleted = false, // ✅ Mặc định là false
   });
 
-  // Chuyển thành Map để lưu
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -21,10 +22,10 @@ class TaskModel {
       'description': description,
       'dateTime': dateTime.toIso8601String(),
       'priority': priority,
+      'isCompleted': isCompleted ? 1 : 0, // ✅ bool -> int
     };
   }
 
-  // Tạo từ Map khi lấy từ DB
   factory TaskModel.fromMap(Map<String, dynamic> map) {
     return TaskModel(
       id: map['id'],
@@ -32,6 +33,26 @@ class TaskModel {
       description: map['description'],
       dateTime: DateTime.parse(map['dateTime']),
       priority: map['priority'],
+      isCompleted: map['isCompleted'] == 1, // ✅ int -> bool
+    );
+  }
+
+  // ✅ Hàm copy để update
+  TaskModel copyWith({
+    int? id,
+    String? title,
+    String? description,
+    DateTime? dateTime,
+    int? priority,
+    bool? isCompleted,
+  }) {
+    return TaskModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      dateTime: dateTime ?? this.dateTime,
+      priority: priority ?? this.priority,
+      isCompleted: isCompleted ?? this.isCompleted,
     );
   }
 }
