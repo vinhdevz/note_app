@@ -13,7 +13,7 @@ class SettingScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         backgroundColor: tdBgColor,
         elevation: 0,
-        title: Text(
+        title: const Text(
           'Settings',
           style: TextStyle(
             color: tdWhite,
@@ -27,11 +27,11 @@ class SettingScreen extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios, color: tdWhite),
+          icon: const Icon(Icons.arrow_back_ios, color: tdWhite),
         ),
       ),
       body: Padding(
-        padding: EdgeInsetsGeometry.symmetric(horizontal: 2.0, vertical: 4.0),
+        padding: const EdgeInsetsGeometry.symmetric(horizontal: 2.0, vertical: 4.0),
         child: ListView(
           children: [
             _buildSettingTitle('Settings'),
@@ -51,21 +51,21 @@ class SettingScreen extends StatelessWidget {
       leading: SvgPicture.asset(icon, width: 24, height: 24),
       title: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           color: tdWhite, fontSize: 16, fontWeight: FontWeight.w400, fontFamily: 'Lato',
         ),
       ),
-      trailing: Icon(Icons.arrow_forward_ios, color: tdWhite, size: 20),
+      trailing: const Icon(Icons.arrow_forward_ios, color: tdWhite, size: 20),
       onTap: () {},
     );
   }
   
   _buildSettingTitle(String title) {
     return Padding(
-      padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
+      padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           color: tdWhite,
           fontSize: 14,
           fontWeight: FontWeight.w400,

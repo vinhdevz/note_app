@@ -19,7 +19,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  bool _obs = true;
+  bool _obsPass = true;
+  bool _obsConfirm = true;
 
   @override
   void dispose() {
@@ -70,7 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: passwordController,
-                obscureText: _obs,
+                obscureText: _obsPass,
                 validator: (value) => value == null || value.length < 6
                     ? 'Password must be at least 6 characters'
                     : null,
@@ -78,11 +79,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   suffixIcon: IconButton(
                     onPressed: () {
                       setState(() {
-                        _obs = !_obs;
+                        _obsPass = !_obsPass;
                       });
                     },
                     icon: Icon(
-                      _obs ? Icons.visibility_off : Icons.visibility,
+                      _obsPass ? Icons.visibility_off : Icons.visibility,
                       color: tdGrey,
                     ),
                   ),
@@ -94,7 +95,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: confirmPasswordController,
-                obscureText: _obs,
+                obscureText: _obsConfirm,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please confirm your password';
@@ -108,11 +109,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   suffixIcon: IconButton(
                     onPressed: () {
                       setState(() {
-                        _obs = !_obs;
+                        _obsConfirm = !_obsConfirm;
                       });
                     },
                     icon: Icon(
-                      _obs ? Icons.visibility_off : Icons.visibility,
+                      _obsConfirm ? Icons.visibility_off : Icons.visibility,
                       color: tdGrey,
                     ),
                   ),
@@ -132,8 +133,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: const Text('Register', style: TextStyle(color: tdWhite)),
               ),
               const SizedBox(height: 32),
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Expanded(child: Divider(color: tdGrey2)),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
@@ -253,11 +254,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   InputDecoration _inputDecoration(String hint) => InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: tdGrey2),
+        hintStyle: const TextStyle(color: tdGrey2),
         enabledBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: tdGrey2)),
+            const OutlineInputBorder(borderSide: BorderSide(color: tdGrey2)),
         focusedBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: tdPurple)),
+            const OutlineInputBorder(borderSide: BorderSide(color: tdPurple)),
       );
 }
 

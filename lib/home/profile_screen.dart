@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
 import 'package:flutter_todo_app/home/setting_screen.dart';
+import '../database/user_db.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   final String? username;
   final VoidCallback onLogout;
 
@@ -14,6 +15,25 @@ class ProfileScreen extends StatelessWidget {
   });
 
   @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late String _username;
+
+  @override
+  void initState() {
+    super.initState();
+    _username = widget.username ?? 'Dovinh';
+  }
+
+  void _updateUsername(String newUsername) {
+    setState(() {
+      _username = newUsername;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: tdBgColor,
@@ -21,63 +41,76 @@ class ProfileScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         backgroundColor: tdBgColor,
         elevation: 0,
-        title: Text(
+        title: const Text(
           'Profile',
-          style: TextStyle(color: tdText, fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Lato',
+          style: TextStyle(
+            color: tdText,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Lato',
           ),
         ),
         centerTitle: true,
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               backgroundImage: AssetImage('assets/images/avatar.png'),
               radius: 50,
             ),
-
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
-              username ?? 'Dovinh',
-              style: TextStyle(color: tdWhite, fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Lato',
+              _username,
+              style: const TextStyle(
+                color: tdWhite,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Lato',
               ),
             ),
-
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   decoration: BoxDecoration(
                     color: Colors.grey[800],
                     borderRadius: BorderRadius.circular(2),
                   ),
-                  child: Text(
+                  child: const Text(
                     '10 Task left',
-                    style: TextStyle(color: tdWhite, fontSize: 14, fontFamily: 'Lato',
+                    style: TextStyle(
+                      color: tdWhite,
+                      fontSize: 14,
+                      fontFamily: 'Lato',
                     ),
                   ),
                 ),
-
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(color: Colors.grey[800],
-                  borderRadius: BorderRadius.circular(2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[800],
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  child: Text(
+                  child: const Text(
                     '5 Task done',
-                    style: TextStyle(color: tdWhite, fontSize: 14, fontFamily: 'Lato',
+                    style: TextStyle(
+                      color: tdWhite,
+                      fontSize: 14,
+                      fontFamily: 'Lato',
                     ),
                   ),
                 ),
               ],
             ),
-
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
             Expanded(
               child: ListView(
                 children: [
@@ -89,7 +122,8 @@ class ProfileScreen extends StatelessWidget {
                     () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SettingScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const SettingScreen()),
                       );
                     },
                   ),
@@ -99,26 +133,33 @@ class ProfileScreen extends StatelessWidget {
                     'Change account name',
                     'assets/icons/user.svg',
                     () {
-                      _showChangeNameDialog(context); 
+                      _showChangeNameDialog(context);
                     },
                   ),
-                  _buildProfileOption(context, 'Change account password', 'assets/icons/key.svg', () {}),
-                  _buildProfileOption(context, 'Change account image', 'assets/icons/camera.svg', () {}),
-                  _buildSectionTitle('Uptodo'),
-                  _buildProfileOption(context, 'About Us', 'assets/icons/menu.svg', () {}),
-                  _buildProfileOption(context, 'FAQ', 'assets/icons/info-circle.svg', () {}),
-                  _buildProfileOption(context, 'Help & Feedback', 'assets/icons/flash.svg', () {}),
-                  _buildProfileOption(context, 'Support Us', 'assets/icons/like.svg', () {}),
-                  ListTile(
-                    leading: SvgPicture.asset('assets/icons/logout.svg', width: 24, height: 24,
-                    ),
-                    title: Text(
-                      'Log out',
-                      style: TextStyle(color: Colors.red, fontSize: 16, fontFamily: 'Lato',
-                      ),
-                    ),
-                    onTap: onLogout,
+                  _buildProfileOption(
+                    context,
+                    'Change account password',
+                    'assets/icons/key.svg',
+                    () {
+                      _showChangePassDialog(context);
+                    },
                   ),
+                  _buildProfileOption(
+                    context,
+                    'Change account image',
+                    'assets/icons/camera.svg',
+                    () {},
+                  ),
+                  _buildSectionTitle('Uptodo'),
+                  _buildProfileOption(
+                      context, 'About Us', 'assets/icons/menu.svg', () {}),
+                  _buildProfileOption(
+                      context, 'FAQ', 'assets/icons/info-circle.svg', () {}),
+                  _buildProfileOption(context, 'Help & Feedback',
+                      'assets/icons/flash.svg', () {}),
+                  _buildProfileOption(
+                      context, 'Support Us', 'assets/icons/like.svg', () {}),
+                  _buildLogout(context),
                 ],
               ),
             ),
@@ -128,57 +169,112 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showChangeNameDialog(BuildContext context) {
-    TextEditingController nameController = TextEditingController(text: username ?? 'Dovinh');
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Log out'),
+          content: const Text('Choose how you want to log out.'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushReplacementNamed('/login');
+              },
+              child: const Text('Keep login info'),
+            ),
+            TextButton(
+              onPressed: () => _handleClearAndRestart(context),
+              child: const Text(
+                'Clear & restart',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _handleClearAndRestart(BuildContext context) async {
+    await UserDatabase.instance.clearLoginState();
+    Navigator.of(context).pop();
+    Navigator.of(context).pushNamedAndRemoveUntil('/intro', (route) => false);
+  }
+
+  Widget _buildLogout(BuildContext context) {
+    return ListTile(
+      leading: SvgPicture.asset(
+        'assets/icons/logout.svg',
+        width: 24,
+        height: 24,
+      ),
+      title: const Text(
+        'Log out',
+        style: TextStyle(
+          color: Colors.red,
+          fontSize: 16,
+          fontFamily: 'Lato',
+        ),
+      ),
+      onTap: () => _showLogoutDialog(context),
+    );
+  }
+
+  void _showChangePassDialog(BuildContext context) {
+    final oldPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.grey[900],
-          title: Text(
-            'Change account name',
-            style: TextStyle(color: tdWhite, fontSize: 18, fontFamily: 'Lato',
+          title: const Text(
+            'Change account Password',
+            style: TextStyle(
+              color: tdWhite,
+              fontSize: 18,
+              fontFamily: 'Lato',
             ),
           ),
-          content: TextField(
-            controller: nameController,
-            style: TextStyle(color: tdWhite, fontFamily: 'Lato'),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.grey[800],
-              hintText: 'Enter new name',
-              hintStyle: TextStyle(color: Colors.grey, fontFamily: 'Lato'),
-              border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5),
-              borderSide: BorderSide.none,
-              ),
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildPasswordField(oldPasswordController, 'Enter old password'),
+              const SizedBox(height: 12),
+              _buildPasswordField(newPasswordController, 'Enter new password'),
+            ],
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); 
-              },
-              child: Text(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
                 'Cancel',
-                style: TextStyle(color: tdWhite, fontSize: 16, fontFamily: 'Lato',
-                ),
+                style: TextStyle(color: tdWhite, fontSize: 16),
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(); 
-              },
+              onPressed: () => _handleChangePassword(
+                context,
+                oldPasswordController,
+                newPasswordController,
+              ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: tdDarkPurple,
                 shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(6),
                 ),
               ),
-              child: Text(
+              child: const Text(
                 'Edit',
-                style: TextStyle(color: tdWhite, fontSize: 16, fontFamily: 'Lato',
+                style: TextStyle(
+                  color: tdWhite,
+                  fontSize: 16,
                 ),
               ),
             ),
@@ -188,7 +284,153 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileOption(BuildContext context, String title, String iconPath, VoidCallback onTap) {
+  Widget _buildPasswordField(
+    TextEditingController controller,
+    String label,
+  ) {
+    return TextFormField(
+      controller: controller,
+      obscureText: true,
+      style: const TextStyle(color: tdWhite),
+      decoration: InputDecoration(
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelStyle: const TextStyle(color: Colors.grey),
+        filled: true,
+        fillColor: Colors.grey[850],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: const BorderSide(color: Colors.grey),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: const BorderSide(color: Colors.grey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: const BorderSide(color: tdDarkPurple),
+        ),
+      ),
+    );
+  }
+
+  void _handleChangePassword(
+    BuildContext context,
+    TextEditingController oldPasswordController,
+    TextEditingController newPasswordController,
+  ) async {
+    final oldPass = oldPasswordController.text.trim();
+    final newPass = newPasswordController.text.trim();
+
+    if (oldPass.isEmpty || newPass.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in both fields')),
+      );
+      return;
+    }
+
+    final success = await UserDatabase.instance.updatePassWord(
+      userName: _username,
+      oldPassWord: oldPass,
+      newPassWord: newPass,
+    );
+
+    if (success) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password changed successfully')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Old password is incorrect')),
+      );
+    }
+  }
+
+  void _showChangeNameDialog(BuildContext context) {
+    TextEditingController nameController =
+        TextEditingController(text: _username);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: const Text(
+            'Change account name',
+            style: TextStyle(
+              color: tdWhite,
+              fontSize: 18,
+              fontFamily: 'Lato',
+            ),
+          ),
+          content: TextField(
+            controller: nameController,
+            style: const TextStyle(color: tdWhite, fontFamily: 'Lato'),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey[800],
+              hintText: 'Enter new name',
+              hintStyle:
+                  const TextStyle(color: Colors.grey, fontFamily: 'Lato'),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  color: tdWhite,
+                  fontSize: 16,
+                  fontFamily: 'Lato',
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => _handleEditUserName(context, nameController),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              child: const Text(
+                'Edit',
+                style: TextStyle(
+                  color: tdWhite,
+                  fontSize: 16,
+                  fontFamily: 'Lato',
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _handleEditUserName(
+      BuildContext context, TextEditingController nameController) async {
+    String newUsername = nameController.text.trim();
+    if (newUsername.isNotEmpty && newUsername != _username) {
+      await UserDatabase.instance.updateUserName(
+        _username,
+        newUsername,
+      );
+      _updateUsername(newUsername);
+    }
+    Navigator.of(context).pop();
+  }
+
+  Widget _buildProfileOption(
+      BuildContext context, String title, String iconPath, VoidCallback onTap) {
     return ListTile(
       leading: SvgPicture.asset(
         iconPath,
@@ -197,11 +439,16 @@ class ProfileScreen extends StatelessWidget {
       ),
       title: Text(
         title,
-        style: TextStyle(color: tdWhite, fontSize: 16, fontFamily: 'Lato',
+        style: const TextStyle(
+          color: tdWhite,
+          fontSize: 16,
+          fontFamily: 'Lato',
         ),
       ),
-      trailing: Icon(
-        Icons.arrow_forward_ios, color: tdWhite, size: 16,
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        color: tdWhite,
+        size: 16,
       ),
       onTap: onTap,
     );
@@ -209,12 +456,18 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildSectionTitle(String title) {
     return Padding(
-      padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
+      padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
       child: Text(
         title,
-        style: TextStyle(color: tdWhite, fontSize: 14, fontWeight: FontWeight.w400, fontFamily: 'Lato',
+        style: const TextStyle(
+          color: tdWhite,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          fontFamily: 'Lato',
         ),
       ),
     );
   }
 }
+
+

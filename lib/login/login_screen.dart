@@ -26,15 +26,17 @@ class _LoginScreenState extends State<LoginScreen> {
     _loadSavedLogin();
   }
 
-  Future<void> _loadSavedLogin() async {
-    String? savedUsername = await UserDatabase.instance.getSavedLogin();
-    if (savedUsername != null) {
-      usernameController.text = savedUsername;
-      setState(() {
-        rememberMe = true;
-      });
-    }
+Future<void> _loadSavedLogin() async {
+  final savedData = await UserDatabase.instance.getSavedLogin();
+  if (savedData != null) {
+    usernameController.text = savedData['username'] ?? '';
+    passwordController.text = savedData['password'] ?? '';
+    setState(() {
+      rememberMe = true;
+    });
   }
+}
+
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
@@ -52,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (rememberMe) {
-      await UserDatabase.instance.saveLoginState(username);
+      await UserDatabase.instance.saveLoginState(username, password);
     } else {
       await UserDatabase.instance.clearLoginState();
     }
@@ -100,13 +102,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 validator: (value) => value == null || value.isEmpty
                     ? 'Username is required'
                     : null,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Enter your Username',
-                  hintStyle: const TextStyle(color: tdGrey),
-                  enabledBorder: const OutlineInputBorder(
+                  hintStyle: TextStyle(color: tdGrey),
+                  enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: tdGrey),
                   ),
-                  focusedBorder: const OutlineInputBorder(
+                  focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: tdPurple),
                   ),
                 ),
@@ -146,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               CheckboxListTile(
                 title: const Text(
-                  'Ghi nhớ đăng nhập',
+                  'Remember To Login',
                   style: TextStyle(color: tdWhite),
                 ),
                 value: rememberMe,
@@ -175,8 +177,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Expanded(child: Divider(color: tdGrey2)),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
@@ -221,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => RegisterScreen()),
+                      MaterialPageRoute(builder: (context) => const RegisterScreen()),
                     );
                   },
                   child: const Text.rich(
