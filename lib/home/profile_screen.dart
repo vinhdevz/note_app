@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
 import 'package:flutter_todo_app/home/setting_screen.dart';
+import 'package:image_picker/image_picker.dart';
 import '../database/user_db.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -20,6 +22,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late String _username;
+  File? _selectedImage;
 
   @override
   void initState() {
@@ -31,6 +34,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       _username = newUsername;
     });
+  }
+
+  void _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: source);
+    if (pickedImage != null) {
+      setState(() {
+        _selectedImage = File(pickedImage.path);
+      });
+    }
+  }
+
+  void _showImageSourceSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Change account Image',
+                style: TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold, color: tdWhite),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: tdWhite),
+                title: const Text('Take picture',
+                    style: TextStyle(color: tdWhite)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: tdWhite),
+                title: const Text('Import from gallery',
+                    style: TextStyle(color: tdWhite)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.drive_folder_upload, color: tdWhite),
+                title: const Text('Import from Google Drive',
+                    style: TextStyle(color: tdWhite)),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content:
+                            Text('Google Drive integration not implemented')),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -57,8 +127,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const CircleAvatar(
-              backgroundImage: AssetImage('assets/images/avatar.png'),
+            CircleAvatar(
+              backgroundImage: _selectedImage != null
+                  ? FileImage(_selectedImage!)
+                  : const AssetImage('assets/images/avatar.png')
+                      as ImageProvider,
               radius: 50,
             ),
             const SizedBox(height: 10),
@@ -75,39 +148,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[800],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                  child: const Text(
-                    '10 Task left',
-                    style: TextStyle(
-                      color: tdWhite,
-                      fontSize: 14,
-                      fontFamily: 'Lato',
-                    ),
-                  ),
-                ),
+                _buildInfoBox('10 Task left'),
                 const SizedBox(width: 20),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[800],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                  child: const Text(
-                    '5 Task done',
-                    style: TextStyle(
-                      color: tdWhite,
-                      fontSize: 14,
-                      fontFamily: 'Lato',
-                    ),
-                  ),
-                ),
+                _buildInfoBox('5 Task done'),
               ],
             ),
             const SizedBox(height: 32),
@@ -119,36 +162,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     context,
                     'App Settings',
                     'assets/icons/setting.svg',
-                    () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SettingScreen()),
-                      );
-                    },
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SettingScreen()),
+                    ),
                   ),
                   _buildSectionTitle('Account'),
                   _buildProfileOption(
                     context,
                     'Change account name',
                     'assets/icons/user.svg',
-                    () {
-                      _showChangeNameDialog(context);
-                    },
+                    () => _showChangeNameDialog(context),
                   ),
                   _buildProfileOption(
                     context,
                     'Change account password',
                     'assets/icons/key.svg',
-                    () {
-                      _showChangePassDialog(context);
-                    },
+                    () => _showChangePassDialog(context),
                   ),
                   _buildProfileOption(
                     context,
                     'Change account image',
                     'assets/icons/camera.svg',
-                    () {},
+                    () => _showImageSourceSheet(context),
                   ),
                   _buildSectionTitle('Uptodo'),
                   _buildProfileOption(
@@ -169,6 +206,75 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildInfoBox(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.grey[800],
+        borderRadius: BorderRadius.circular(2),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: tdWhite,
+          fontSize: 14,
+          fontFamily: 'Lato',
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: tdWhite,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          fontFamily: 'Lato',
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileOption(
+      BuildContext context, String title, String iconPath, VoidCallback onTap) {
+    return ListTile(
+      leading: SvgPicture.asset(iconPath, width: 24, height: 24),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: tdWhite,
+          fontSize: 16,
+          fontFamily: 'Lato',
+        ),
+      ),
+      trailing: const Icon(Icons.arrow_forward_ios, color: tdWhite, size: 16),
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildLogout(BuildContext context) {
+    return ListTile(
+      leading: SvgPicture.asset(
+        'assets/icons/logout.svg',
+        width: 24,
+        height: 24,
+      ),
+      title: const Text(
+        'Log out',
+        style: TextStyle(
+          color: Colors.red,
+          fontSize: 16,
+          fontFamily: 'Lato',
+        ),
+      ),
+      onTap: () => _showLogoutDialog(context),
+    );
+  }
+
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -181,7 +287,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           content: const Text('Choose how you want to log out.'),
           actions: [
             TextButton(
-              onPressed: () async {
+              onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushReplacementNamed('/login');
               },
@@ -206,25 +312,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.of(context).pushNamedAndRemoveUntil('/intro', (route) => false);
   }
 
-  Widget _buildLogout(BuildContext context) {
-    return ListTile(
-      leading: SvgPicture.asset(
-        'assets/icons/logout.svg',
-        width: 24,
-        height: 24,
-      ),
-      title: const Text(
-        'Log out',
-        style: TextStyle(
-          color: Colors.red,
-          fontSize: 16,
-          fontFamily: 'Lato',
-        ),
-      ),
-      onTap: () => _showLogoutDialog(context),
-    );
-  }
-
   void _showChangePassDialog(BuildContext context) {
     final oldPasswordController = TextEditingController();
     final newPasswordController = TextEditingController();
@@ -234,14 +321,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.grey[900],
-          title: const Text(
-            'Change account Password',
-            style: TextStyle(
-              color: tdWhite,
-              fontSize: 18,
-              fontFamily: 'Lato',
-            ),
-          ),
+          title: const Text('Change account Password',
+              style: TextStyle(color: tdWhite, fontSize: 18)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -253,10 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(color: tdWhite, fontSize: 16),
-              ),
+              child: const Text('Cancel', style: TextStyle(color: tdWhite)),
             ),
             ElevatedButton(
               onPressed: () => _handleChangePassword(
@@ -266,17 +344,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: tdDarkPurple,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
               ),
-              child: const Text(
-                'Edit',
-                style: TextStyle(
-                  color: tdWhite,
-                  fontSize: 16,
-                ),
-              ),
+              child: const Text('Edit', style: TextStyle(color: tdWhite)),
             ),
           ],
         );
@@ -284,10 +353,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildPasswordField(
-    TextEditingController controller,
-    String label,
-  ) {
+  Widget _buildPasswordField(TextEditingController controller, String label) {
     return TextFormField(
       controller: controller,
       obscureText: true,
@@ -300,7 +366,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         fillColor: Colors.grey[850],
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: Colors.grey),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
@@ -348,31 +413,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showChangeNameDialog(BuildContext context) {
-    TextEditingController nameController =
-        TextEditingController(text: _username);
+    final nameController = TextEditingController(text: _username);
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.grey[900],
-          title: const Text(
-            'Change account name',
-            style: TextStyle(
-              color: tdWhite,
-              fontSize: 18,
-              fontFamily: 'Lato',
-            ),
-          ),
+          title: const Text('Change account name',
+              style: TextStyle(color: tdWhite, fontSize: 18)),
           content: TextField(
             controller: nameController,
-            style: const TextStyle(color: tdWhite, fontFamily: 'Lato'),
+            style: const TextStyle(color: tdWhite),
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.grey[800],
               hintText: 'Enter new name',
-              hintStyle:
-                  const TextStyle(color: Colors.grey, fontFamily: 'Lato'),
+              hintStyle: const TextStyle(color: Colors.grey),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
                 borderSide: BorderSide.none,
@@ -381,34 +438,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                'Cancel',
-                style: TextStyle(
-                  color: tdWhite,
-                  fontSize: 16,
-                  fontFamily: 'Lato',
-                ),
-              ),
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel', style: TextStyle(color: tdWhite)),
             ),
             ElevatedButton(
               onPressed: () => _handleEditUserName(context, nameController),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
               ),
-              child: const Text(
-                'Edit',
-                style: TextStyle(
-                  color: tdWhite,
-                  fontSize: 16,
-                  fontFamily: 'Lato',
-                ),
-              ),
+              child: const Text('Edit', style: TextStyle(color: tdWhite)),
             ),
           ],
         );
@@ -428,46 +466,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     Navigator.of(context).pop();
   }
-
-  Widget _buildProfileOption(
-      BuildContext context, String title, String iconPath, VoidCallback onTap) {
-    return ListTile(
-      leading: SvgPicture.asset(
-        iconPath,
-        width: 24,
-        height: 24,
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: tdWhite,
-          fontSize: 16,
-          fontFamily: 'Lato',
-        ),
-      ),
-      trailing: const Icon(
-        Icons.arrow_forward_ios,
-        color: tdWhite,
-        size: 16,
-      ),
-      onTap: onTap,
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: tdWhite,
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          fontFamily: 'Lato',
-        ),
-      ),
-    );
-  }
 }
-
-

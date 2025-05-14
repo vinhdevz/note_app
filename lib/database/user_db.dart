@@ -139,40 +139,44 @@ class UserDatabase {
       where: 'username = ?',
       whereArgs: [oldUserName],
     );
-    await db.update('login_state', {'username': newUserName},
-        where: 'username = ?', whereArgs: [oldUserName]);
+    await db.update(
+      'login_state',
+      {'username': newUserName},
+      where: 'username = ?',
+      whereArgs: [oldUserName],
+    );
+  }
+
+  Future<bool> updatePassWord({
+    required String userName,
+    required String oldPassWord,
+    required String newPassWord,
+  }) async {
+    final db = await database;
+
+    final hashedOldPass = _hashPassword(oldPassWord);
+    final hashedNewPass = _hashPassword(newPassWord);
+
+    final result = await db.query(
+      'users',
+      where: 'username = ? AND password = ?',
+      whereArgs: [userName, hashedOldPass],
+    );
+
+    if (result.isNotEmpty) {
+      await db.update(
+        'users',
+        {'password': hashedNewPass},
+        where: 'username = ?',
+        whereArgs: [userName],
+      );
+      return true;
+    }
+    return false;
   }
 
   Future close() async {
     final db = await database;
     db.close();
   }
-
-  Future<bool> updatePassWord({
-  required String userName,
-  required String oldPassWord,
-  required String newPassWord,
-}) async {
-  final db = await instance.database;
-
-  final hashedOldPass = _hashPassword(oldPassWord);
-  final hashedNewPass = _hashPassword(newPassWord);
-
-  final result = await db.query(
-    'users',
-    where: 'username = ? AND password = ?',
-    whereArgs: [userName, hashedOldPass], 
-  );
-
-  if (result.isNotEmpty) {
-    await db.update(
-      'users',
-      {'password': hashedNewPass}, 
-      where: 'username = ?',
-      whereArgs: [userName],
-    );
-    return true;
-  }
-  return false;
-}
 }
