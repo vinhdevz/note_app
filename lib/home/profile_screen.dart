@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
+import 'package:flutter_todo_app/database/user_db.dart';
+import 'package:flutter_todo_app/database/task_database.dart';
 import 'package:flutter_todo_app/home/setting_screen.dart';
-import '../database/user_db.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? username;
@@ -15,16 +16,27 @@ class ProfileScreen extends StatefulWidget {
   });
 
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late String _username;
+  int _completedCount = 0;
+  int _uncompletedCount = 0;
 
   @override
   void initState() {
     super.initState();
     _username = widget.username ?? 'Dovinh';
+    _loadTaskStats();
+  }
+
+  Future<void> _loadTaskStats() async {
+    final stats = await TaskDatabase.instance.loadTaskStats();
+    setState(() {
+      _completedCount = stats['completed'] ?? 0;
+      _uncompletedCount = stats['uncompleted'] ?? 0;
+    });
   }
 
   void _updateUsername(String newUsername) {
@@ -74,41 +86,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[800],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                  child: const Text(
-                    '10 Task left',
-                    style: TextStyle(
-                      color: tdWhite,
-                      fontSize: 14,
-                      fontFamily: 'Lato',
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[800],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                  child: const Text(
-                    '5 Task done',
-                    style: TextStyle(
-                      color: tdWhite,
-                      fontSize: 14,
-                      fontFamily: 'Lato',
-                    ),
-                  ),
-                ),
-              ],
+              children: _buildTaskStats(),
             ),
             const SizedBox(height: 32),
             Expanded(
@@ -122,8 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const SettingScreen()),
+                        MaterialPageRoute(builder: (_) => const SettingScreen()),
                       );
                     },
                   ),
@@ -132,17 +109,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     context,
                     'Change account name',
                     'assets/icons/user.svg',
-                    () {
-                      _showChangeNameDialog(context);
-                    },
+                    () => _showChangeNameDialog(context),
                   ),
                   _buildProfileOption(
                     context,
                     'Change account password',
                     'assets/icons/key.svg',
-                    () {
-                      _showChangePassDialog(context);
-                    },
+                    () => _showChangePassDialog(context),
                   ),
                   _buildProfileOption(
                     context,
@@ -152,13 +125,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   _buildSectionTitle('Uptodo'),
                   _buildProfileOption(
-                      context, 'About Us', 'assets/icons/menu.svg', () {}),
+                    context, 'About Us', 'assets/icons/menu.svg', () {}),
                   _buildProfileOption(
-                      context, 'FAQ', 'assets/icons/info-circle.svg', () {}),
-                  _buildProfileOption(context, 'Help & Feedback',
-                      'assets/icons/flash.svg', () {}),
+                    context, 'FAQ', 'assets/icons/info-circle.svg', () {}),
                   _buildProfileOption(
-                      context, 'Support Us', 'assets/icons/like.svg', () {}),
+                    context, 'Help & Feedback', 'assets/icons/flash.svg', () {}),
+                  _buildProfileOption(
+                    context, 'Support Us', 'assets/icons/like.svg', () {}),
                   _buildLogout(context),
                 ],
               ),
@@ -169,34 +142,88 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  List<Widget> _buildTaskStats() {
+    return [
+      _buildStatBox('$_uncompletedCount Task left'),
+      const SizedBox(width: 20),
+      _buildStatBox('$_completedCount Task done'),
+    ];
+  }
+
+  Widget _buildStatBox(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.grey[800],
+        borderRadius: BorderRadius.circular(2),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(color: tdWhite, fontSize: 14, fontFamily: 'Lato'),
+      ),
+    );
+  }
+
+  Widget _buildProfileOption(
+      BuildContext context, String title, String iconPath, VoidCallback onTap) {
+    return ListTile(
+      leading: SvgPicture.asset(iconPath, width: 24, height: 24),
+      title: Text(
+        title,
+        style: const TextStyle(color: tdWhite, fontSize: 16, fontFamily: 'Lato'),
+      ),
+      trailing: const Icon(Icons.arrow_forward_ios, color: tdWhite, size: 16),
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: tdWhite,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          fontFamily: 'Lato',
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogout(BuildContext context) {
+    return ListTile(
+      leading: SvgPicture.asset('assets/icons/logout.svg', width: 24, height: 24),
+      title: const Text(
+        'Log out',
+        style: TextStyle(color: Colors.red, fontSize: 16, fontFamily: 'Lato'),
+      ),
+      onTap: () => _showLogoutDialog(context),
+    );
+  }
+
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Log out'),
+        content: const Text('Choose how you want to log out.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacementNamed('/login');
+            },
+            child: const Text('Keep login info'),
           ),
-          title: const Text('Log out'),
-          content: const Text('Choose how you want to log out.'),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                Navigator.of(context).pushReplacementNamed('/login');
-              },
-              child: const Text('Keep login info'),
-            ),
-            TextButton(
-              onPressed: () => _handleClearAndRestart(context),
-              child: const Text(
-                'Clear & restart',
-                style: TextStyle(color: Colors.red),
-              ),
-            ),
-          ],
-        );
-      },
+          TextButton(
+            onPressed: () => _handleClearAndRestart(context),
+            child: const Text('Clear & restart', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -206,23 +233,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.of(context).pushNamedAndRemoveUntil('/intro', (route) => false);
   }
 
-  Widget _buildLogout(BuildContext context) {
-    return ListTile(
-      leading: SvgPicture.asset(
-        'assets/icons/logout.svg',
-        width: 24,
-        height: 24,
-      ),
-      title: const Text(
-        'Log out',
-        style: TextStyle(
-          color: Colors.red,
-          fontSize: 16,
-          fontFamily: 'Lato',
+  void _showChangeNameDialog(BuildContext context) {
+    final nameController = TextEditingController(text: _username);
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text(
+          'Change account name',
+          style: TextStyle(color: tdWhite, fontSize: 18, fontFamily: 'Lato'),
         ),
+        content: TextField(
+          controller: nameController,
+          style: const TextStyle(color: tdWhite, fontFamily: 'Lato'),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey[800],
+            hintText: 'Enter new name',
+            hintStyle: const TextStyle(color: Colors.grey, fontFamily: 'Lato'),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel', style: TextStyle(color: tdWhite, fontSize: 16)),
+          ),
+          ElevatedButton(
+            onPressed: () => _handleEditUserName(context, nameController),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+            ),
+            child: const Text('Edit', style: TextStyle(color: tdWhite, fontSize: 16)),
+          ),
+        ],
       ),
-      onTap: () => _showLogoutDialog(context),
     );
+  }
+
+  void _handleEditUserName(BuildContext context, TextEditingController controller) async {
+    final newUsername = controller.text.trim();
+    if (newUsername.isNotEmpty && newUsername != _username) {
+      await UserDatabase.instance.updateUserName(_username, newUsername);
+      _updateUsername(newUsername);
+    }
+    Navigator.of(context).pop();
   }
 
   void _showChangePassDialog(BuildContext context) {
@@ -231,63 +291,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.grey[900],
-          title: const Text(
-            'Change account Password',
-            style: TextStyle(
-              color: tdWhite,
-              fontSize: 18,
-              fontFamily: 'Lato',
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildPasswordField(oldPasswordController, 'Enter old password'),
-              const SizedBox(height: 12),
-              _buildPasswordField(newPasswordController, 'Enter new password'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(color: tdWhite, fontSize: 16),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () => _handleChangePassword(
-                context,
-                oldPasswordController,
-                newPasswordController,
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: tdDarkPurple,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              ),
-              child: const Text(
-                'Edit',
-                style: TextStyle(
-                  color: tdWhite,
-                  fontSize: 16,
-                ),
-              ),
-            ),
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text('Change account Password', style: TextStyle(color: tdWhite, fontSize: 18)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildPasswordField(oldPasswordController, 'Enter old password'),
+            const SizedBox(height: 12),
+            _buildPasswordField(newPasswordController, 'Enter new password'),
           ],
-        );
-      },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel', style: TextStyle(color: tdWhite, fontSize: 16)),
+          ),
+          ElevatedButton(
+            onPressed: () => _handleChangePassword(
+              context,
+              oldPasswordController,
+              newPasswordController,
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: tdDarkPurple,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+            ),
+            child: const Text('Edit', style: TextStyle(color: tdWhite, fontSize: 16)),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildPasswordField(
-    TextEditingController controller,
-    String label,
-  ) {
+  Widget _buildPasswordField(TextEditingController controller, String label) {
     return TextFormField(
       controller: controller,
       obscureText: true,
@@ -316,11 +353,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _handleChangePassword(
     BuildContext context,
-    TextEditingController oldPasswordController,
-    TextEditingController newPasswordController,
+    TextEditingController oldController,
+    TextEditingController newController,
   ) async {
-    final oldPass = oldPasswordController.text.trim();
-    final newPass = newPasswordController.text.trim();
+    final oldPass = oldController.text.trim();
+    final newPass = newController.text.trim();
 
     if (oldPass.isEmpty || newPass.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -346,128 +383,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
   }
-
-  void _showChangeNameDialog(BuildContext context) {
-    TextEditingController nameController =
-        TextEditingController(text: _username);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.grey[900],
-          title: const Text(
-            'Change account name',
-            style: TextStyle(
-              color: tdWhite,
-              fontSize: 18,
-              fontFamily: 'Lato',
-            ),
-          ),
-          content: TextField(
-            controller: nameController,
-            style: const TextStyle(color: tdWhite, fontFamily: 'Lato'),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.grey[800],
-              hintText: 'Enter new name',
-              hintStyle:
-                  const TextStyle(color: Colors.grey, fontFamily: 'Lato'),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                'Cancel',
-                style: TextStyle(
-                  color: tdWhite,
-                  fontSize: 16,
-                  fontFamily: 'Lato',
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () => _handleEditUserName(context, nameController),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              ),
-              child: const Text(
-                'Edit',
-                style: TextStyle(
-                  color: tdWhite,
-                  fontSize: 16,
-                  fontFamily: 'Lato',
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _handleEditUserName(
-      BuildContext context, TextEditingController nameController) async {
-    String newUsername = nameController.text.trim();
-    if (newUsername.isNotEmpty && newUsername != _username) {
-      await UserDatabase.instance.updateUserName(
-        _username,
-        newUsername,
-      );
-      _updateUsername(newUsername);
-    }
-    Navigator.of(context).pop();
-  }
-
-  Widget _buildProfileOption(
-      BuildContext context, String title, String iconPath, VoidCallback onTap) {
-    return ListTile(
-      leading: SvgPicture.asset(
-        iconPath,
-        width: 24,
-        height: 24,
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: tdWhite,
-          fontSize: 16,
-          fontFamily: 'Lato',
-        ),
-      ),
-      trailing: const Icon(
-        Icons.arrow_forward_ios,
-        color: tdWhite,
-        size: 16,
-      ),
-      onTap: onTap,
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: tdWhite,
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          fontFamily: 'Lato',
-        ),
-      ),
-    );
-  }
 }
-
-

@@ -1,4 +1,4 @@
-import 'package:sqflite/sqflite.dart'; // Nhập sqflite
+import 'package:sqflite/sqflite.dart'; 
 import 'package:path/path.dart';
 
 import '../models/task_model.dart';
@@ -18,19 +18,19 @@ class TaskDatabase {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-
     return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
   Future _createDB(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE tasks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        description TEXT NOT NULL,
-        dateTime TEXT NOT NULL,
-        priority INTEGER NOT NULL
-      )
+    CREATE TABLE tasks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      dateTime TEXT NOT NULL,
+      priority INTEGER NOT NULL,
+      isCompleted INTEGER NOT NULL DEFAULT 0
+    )
     ''');
   }
 
@@ -63,5 +63,22 @@ class TaskDatabase {
   Future close() async {
     final db = await instance.database;
     db.close();
+  }
+
+  
+  Future<Map<String, int>> loadTaskStats() async {
+    final db = await instance.database;
+
+    
+    final completedResult = await db.rawQuery('SELECT COUNT(*) FROM tasks WHERE isCompleted = 1');
+    final uncompletedResult = await db.rawQuery('SELECT COUNT(*) FROM tasks WHERE isCompleted = 0');
+    
+    final completed = Sqflite.firstIntValue(completedResult) ?? 0;
+    final uncompleted = Sqflite.firstIntValue(uncompletedResult) ?? 0;
+
+    return {
+      'completed': completed,
+      'uncompleted': uncompleted,
+    };
   }
 }
