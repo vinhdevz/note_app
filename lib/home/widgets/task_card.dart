@@ -4,6 +4,7 @@ import 'package:flutter_todo_app/constants/color.dart';
 import 'package:flutter_todo_app/home/widgets/add_task_screen.dart';
 import 'package:flutter_todo_app/models/task_model.dart';
 import 'package:flutter_todo_app/database/task_database.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class TaskCard extends StatelessWidget {
   final TaskModel task;
@@ -29,7 +30,6 @@ class TaskCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          
           Align(
             alignment: Alignment.center,
             child: GestureDetector(
@@ -38,7 +38,7 @@ class TaskCard extends StatelessWidget {
                     task.copyWith(isCompleted: !task.isCompleted);
                 await TaskDatabase.instance.updateTask(updatedTask);
                 if (onDelete != null) {
-                  onDelete!(); 
+                  onDelete!();
                 }
               },
               child: Container(
@@ -57,16 +57,13 @@ class TaskCard extends StatelessWidget {
             ),
           ),
 
-         
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                   
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,12 +103,10 @@ class TaskCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    
                     priorityInTask(),
                   ],
                 ),
                 const SizedBox(height: 2),
-               
                 time(context),
               ],
             ),
@@ -122,10 +117,38 @@ class TaskCard extends StatelessWidget {
   }
 
   Widget priorityInTask() {
+    Color bgColor;
+    Color iconColor;
+
+    switch (task.priority) {
+      case 1:
+        bgColor = priEasy;
+        iconColor = iconEasy;
+        break;
+      case 2:
+        bgColor = priNormal;
+        iconColor = iconNormal;
+        break;
+      case 3:
+        bgColor = priHard;
+        iconColor = iconHard;
+        break;
+      default:
+        bgColor = Colors.grey;
+        iconColor = Colors.grey;
+    }
+
+    String priorityText = task.priority == 1
+        ? 'Easy'.tr()
+        : task.priority == 2
+            ? 'Normal'.tr()
+            : 'Hard'.tr();
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       decoration: BoxDecoration(
-        border: Border.all(color: tdPurple),
+        color: bgColor,
+        border: Border.all(color: Colors.black),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
@@ -134,11 +157,12 @@ class TaskCard extends StatelessWidget {
             'assets/icons/flag.svg',
             width: 16,
             height: 16,
+            colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
           ),
           const SizedBox(width: 4),
           Text(
-            '${task.priority}',
-            style: const TextStyle(color: Colors.white, fontSize: 12),
+            priorityText,
+            style: const TextStyle(color: Colors.white, fontSize: 14),
           ),
         ],
       ),

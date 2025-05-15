@@ -1,5 +1,4 @@
 import 'package:sqflite/sqflite.dart';
-
 import 'package:path/path.dart';
 
 import '../models/task_model.dart';
@@ -12,37 +11,45 @@ class TaskDatabase {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('tasks.db');
+    _database = await _initDB('tasks.db', resetDB: false); 
     return _database!;
   }
 
-  Future<Database> _initDB(String filePath) async {
+  Future<Database> _initDB(String filePath, {bool resetDB = false}) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
+
+    if (resetDB) {
+      await deleteDatabase(path);
+    }
+
     return await openDatabase(
       path,
       version: 2,
       onCreate: _createDB,
       onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 2) {
+        final columns = await db.rawQuery("PRAGMA table_info(tasks)");
+        final hasIsCompleted = columns.any((col) => col['name'] == 'isCompleted');
+
+        if (!hasIsCompleted) {
           await db.execute(
-              'ALTER TABLE tasks ADD COLUMN isCompleted INTEGER NOT NULL DEFAULT 0');
+            'ALTER TABLE tasks ADD COLUMN isCompleted INTEGER NOT NULL DEFAULT 0',
+          );
         }
       },
     );
-
   }
 
   Future _createDB(Database db, int version) async {
     await db.execute('''
-    CREATE TABLE tasks (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      description TEXT NOT NULL,
-      dateTime TEXT NOT NULL,
-      priority INTEGER NOT NULL,
-      isCompleted INTEGER NOT NULL DEFAULT 0
-    )
+      CREATE TABLE tasks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        dateTime TEXT NOT NULL,
+        priority INTEGER NOT NULL,
+        isCompleted INTEGER NOT NULL DEFAULT 0
+      )
     ''');
   }
 
@@ -77,14 +84,16 @@ class TaskDatabase {
     db.close();
   }
 
-
-  
   Future<Map<String, int>> loadTaskStats() async {
     final db = await instance.database;
 
-    
-    final completedResult = await db.rawQuery('SELECT COUNT(*) FROM tasks WHERE isCompleted = 1');
-    final uncompletedResult = await db.rawQuery('SELECT COUNT(*) FROM tasks WHERE isCompleted = 0');
+    final completedResult = await db.rawQuery(
+      'SELECT COUNT(*) FROM tasks WHERE isCompleted = 1',
+    );
+    final uncompletedResult = await db.rawQuery(
+      'SELECT COUNT(*) FROM tasks WHERE isCompleted = 0',
+    );
+
     final completed = Sqflite.firstIntValue(completedResult) ?? 0;
     final uncompleted = Sqflite.firstIntValue(uncompletedResult) ?? 0;
 
