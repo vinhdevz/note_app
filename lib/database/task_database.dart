@@ -1,4 +1,5 @@
-import 'package:sqflite/sqflite.dart'; 
+import 'package:sqflite/sqflite.dart';
+
 import 'package:path/path.dart';
 
 import '../models/task_model.dart';
@@ -18,7 +19,18 @@ class TaskDatabase {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(
+      path,
+      version: 2,
+      onCreate: _createDB,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute(
+              'ALTER TABLE tasks ADD COLUMN isCompleted INTEGER NOT NULL DEFAULT 0');
+        }
+      },
+    );
+
   }
 
   Future _createDB(Database db, int version) async {
@@ -65,6 +77,7 @@ class TaskDatabase {
     db.close();
   }
 
+
   
   Future<Map<String, int>> loadTaskStats() async {
     final db = await instance.database;
@@ -72,7 +85,6 @@ class TaskDatabase {
     
     final completedResult = await db.rawQuery('SELECT COUNT(*) FROM tasks WHERE isCompleted = 1');
     final uncompletedResult = await db.rawQuery('SELECT COUNT(*) FROM tasks WHERE isCompleted = 0');
-    
     final completed = Sqflite.firstIntValue(completedResult) ?? 0;
     final uncompleted = Sqflite.firstIntValue(uncompletedResult) ?? 0;
 
