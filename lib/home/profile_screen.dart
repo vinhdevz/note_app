@@ -1,10 +1,11 @@
+import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
-import 'package:flutter_todo_app/database/user_db.dart';
-import 'package:flutter_todo_app/database/task_database.dart';
 import 'package:flutter_todo_app/home/setting_screen.dart';
+import 'package:image_picker/image_picker.dart';
+import '../database/user_db.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? username;
@@ -17,33 +18,90 @@ class ProfileScreen extends StatefulWidget {
   });
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  _ProfileScreenState createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late String _username;
-  int _completedCount = 0;
-  int _uncompletedCount = 0;
+  File? _selectedImage;
 
   @override
   void initState() {
     super.initState();
     _username = widget.username ?? 'Dovinh';
-    _loadTaskStats();
-  }
-
-  Future<void> _loadTaskStats() async {
-    final stats = await TaskDatabase.instance.loadTaskStats();
-    setState(() {
-      _completedCount = stats['completed'] ?? 0;
-      _uncompletedCount = stats['uncompleted'] ?? 0;
-    });
   }
 
   void _updateUsername(String newUsername) {
     setState(() {
       _username = newUsername;
     });
+  }
+
+  void _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: source);
+    if (pickedImage != null) {
+      setState(() {
+        _selectedImage = File(pickedImage.path);
+      });
+    }
+  }
+
+  void _showImageSourceSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Change account Image',
+                style: TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold, color: tdWhite),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: tdWhite),
+                title: const Text('Take picture',
+                    style: TextStyle(color: tdWhite)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: tdWhite),
+                title: const Text('Import from gallery',
+                    style: TextStyle(color: tdWhite)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.drive_folder_upload, color: tdWhite),
+                title: const Text('Import from Google Drive',
+                    style: TextStyle(color: tdWhite)),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content:
+                            Text('Google Drive integration not implemented')),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -70,8 +128,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const CircleAvatar(
-              backgroundImage: AssetImage('assets/images/avatar.png'),
+            CircleAvatar(
+              backgroundImage: _selectedImage != null
+                  ? FileImage(_selectedImage!)
+                  : const AssetImage('assets/images/avatar.png')
+                      as ImageProvider,
               radius: 50,
             ),
             const SizedBox(height: 10),
@@ -87,7 +148,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: _buildTaskStats(),
+              children: [
+                _buildInfoBox('10 Task left'),
+                const SizedBox(width: 20),
+                _buildInfoBox('5 Task done'),
+              ],
             ),
             const SizedBox(height: 32),
             Expanded(
@@ -98,12 +163,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     context,
                     'App Settings'.tr(),
                     'assets/icons/setting.svg',
-                    () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const SettingScreen()),
-                      );
-                    },
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SettingScreen()),
+                    ),
                   ),
                   _buildSectionTitle('Account'.tr()),
                   _buildProfileOption(
@@ -122,33 +186,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     context,
                     'Change account image'.tr(),
                     'assets/icons/camera.svg',
-                    () {},
+                    () => _showImageSourceSheet(context),
                   ),
-                  _buildSectionTitle('Uptodo'.tr()),
-                  _buildProfileOption(
-                    context,
-                    'About Us'.tr(),
-                    'assets/icons/menu.svg',
-                    () {},
-                  ),
-                  _buildProfileOption(
-                    context,
-                    'FAQ'.tr(),
-                    'assets/icons/info-circle.svg',
-                    () {},
-                  ),
-                  _buildProfileOption(
-                    context,
-                    'Help & Feedback'.tr(),
-                    'assets/icons/flash.svg',
-                    () {},
-                  ),
-                  _buildProfileOption(
-                    context,
-                    'Support Us'.tr(),
-                    'assets/icons/like.svg',
-                    () {},
-                  ),
+                  _buildSectionTitle('Uptodo'),
+                  _buildProfileOption(context, 'About Us', 'assets/icons/menu.svg', () {}),
+                  _buildProfileOption(context, 'FAQ', 'assets/icons/info-circle.svg', () {}),
+                  _buildProfileOption(context, 'Help & Feedback', 'assets/icons/flash.svg', () {}),
+                  _buildProfileOption(context, 'Support Us', 'assets/icons/like.svg', () {}),
                   _buildLogout(context),
                 ],
               ),
@@ -159,15 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  List<Widget> _buildTaskStats() {
-    return [
-      _buildStatBox('$_uncompletedCount ${'Task left'.tr()}'),
-      const SizedBox(width: 20),
-      _buildStatBox('$_completedCount ${'Task done'.tr()}'),
-    ];
-  }
-
-  Widget _buildStatBox(String text) {
+  Widget _buildInfoBox(String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
@@ -176,21 +212,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Text(
         text,
-        style: const TextStyle(color: tdWhite, fontSize: 14, fontFamily: 'Lato'),
+        style: const TextStyle(
+          color: tdWhite,
+          fontSize: 14,
+          fontFamily: 'Lato',
+        ),
       ),
-    );
-  }
-
-  Widget _buildProfileOption(
-      BuildContext context, String title, String iconPath, VoidCallback onTap) {
-    return ListTile(
-      leading: SvgPicture.asset(iconPath, width: 24, height: 24),
-      title: Text(
-        title,
-        style: const TextStyle(color: tdWhite, fontSize: 16, fontFamily: 'Lato'),
-      ),
-      trailing: const Icon(Icons.arrow_forward_ios, color: tdWhite, size: 16),
-      onTap: onTap,
     );
   }
 
@@ -209,12 +236,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildProfileOption(
+      BuildContext context, String title, String iconPath, VoidCallback onTap) {
+    return ListTile(
+      leading: SvgPicture.asset(iconPath, width: 24, height: 24),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: tdWhite,
+          fontSize: 16,
+          fontFamily: 'Lato',
+        ),
+      ),
+      trailing: const Icon(Icons.arrow_forward_ios, color: tdWhite, size: 16),
+      onTap: onTap,
+    );
+  }
+
   Widget _buildLogout(BuildContext context) {
     return ListTile(
-      leading: SvgPicture.asset('assets/icons/logout.svg', width: 24, height: 24),
-      title: Text(
-        'Log out'.tr(),
-        style: const TextStyle(color: Colors.red, fontSize: 16, fontFamily: 'Lato'),
+      leading: SvgPicture.asset(
+        'assets/icons/logout.svg',
+        width: 24,
+        height: 24,
+      ),
+      title: const Text(
+        'Log out',
+        style: TextStyle(
+          color: Colors.red,
+          fontSize: 16,
+          fontFamily: 'Lato',
+        ),
       ),
       onTap: () => _showLogoutDialog(context),
     );
@@ -223,24 +275,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Log out'.tr()),
-        content: Text('Choose how you want to log out.'.tr()),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pushReplacementNamed('/login');
-            },
-            child: Text('Keep login info'.tr()),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-          TextButton(
-            onPressed: () => _handleClearAndRestart(context),
-            child: Text('Clear & restart'.tr(), style: const TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+          title: const Text('Log out'),
+          content: const Text('Choose how you want to log out.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushReplacementNamed('/login');
+              },
+              child: const Text('Keep login info'),
+            ),
+            TextButton(
+              onPressed: () => _handleClearAndRestart(context),
+              child: const Text(
+                'Clear & restart',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -250,98 +309,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.of(context).pushNamedAndRemoveUntil('/intro', (route) => false);
   }
 
-  void _showChangeNameDialog(BuildContext context) {
-    final nameController = TextEditingController(text: _username);
-
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: Text(
-          'Change account name'.tr(),
-          style: const TextStyle(color: tdWhite, fontSize: 18, fontFamily: 'Lato'),
-        ),
-        content: TextField(
-          controller: nameController,
-          style: const TextStyle(color: tdWhite, fontFamily: 'Lato'),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[800],
-            hintText: 'Enter new name'.tr(),
-            hintStyle: const TextStyle(color: Colors.grey, fontFamily: 'Lato'),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
-          ),
-          ElevatedButton(
-            onPressed: () => _handleEditUserName(context, nameController),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-            ),
-            child: Text('Edit'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleEditUserName(BuildContext context, TextEditingController controller) async {
-    final newUsername = controller.text.trim();
-    if (newUsername.isNotEmpty && newUsername != _username) {
-      await UserDatabase.instance.updateUserName(_username, newUsername);
-      _updateUsername(newUsername);
-    }
-    Navigator.of(context).pop();
-  }
-
   void _showChangePassDialog(BuildContext context) {
     final oldPasswordController = TextEditingController();
     final newPasswordController = TextEditingController();
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: Text('Change account Password'.tr(), style: const TextStyle(color: tdWhite, fontSize: 18)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildPasswordField(oldPasswordController, 'Enter old password'.tr()),
-            const SizedBox(height: 12),
-            _buildPasswordField(newPasswordController, 'Enter new password'.tr()),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: const Text('Change account Password',
+              style: TextStyle(color: tdWhite, fontSize: 18)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildPasswordField(oldPasswordController, 'Enter old password'),
+              const SizedBox(height: 12),
+              _buildPasswordField(newPasswordController, 'Enter new password'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel', style: TextStyle(color: tdWhite)),
+            ),
+            ElevatedButton(
+              onPressed: () => _handleChangePassword(
+                context,
+                oldPasswordController,
+                newPasswordController,
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: tdDarkPurple,
+              ),
+              child: const Text('Edit', style: TextStyle(color: tdWhite)),
+            ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
-          ),
-          ElevatedButton(
-            onPressed: () => _handleChangePassword(
-              context,
-              oldPasswordController,
-              newPasswordController,
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: tdDarkPurple,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-            ),
-            child: Text('Edit'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildPasswordField(TextEditingController controller, String label) {
+  Widget _buildPasswordField(
+      TextEditingController controller, String label) {
     return TextFormField(
       controller: controller,
       obscureText: true,
@@ -354,7 +364,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         fillColor: Colors.grey[850],
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: Colors.grey),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
@@ -370,11 +379,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _handleChangePassword(
     BuildContext context,
-    TextEditingController oldController,
-    TextEditingController newController,
+    TextEditingController oldPasswordController,
+    TextEditingController newPasswordController,
   ) async {
-    final oldPass = oldController.text.trim();
-    final newPass = newController.text.trim();
+    final oldPass = oldPasswordController.text.trim();
+    final newPass = newPasswordController.text.trim();
 
     if (oldPass.isEmpty || newPass.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -399,5 +408,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
         SnackBar(content: Text('Old password is incorrect'.tr())),
       );
     }
+  }
+
+  void _showChangeNameDialog(BuildContext context) {
+    final nameController = TextEditingController(text: _username);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: const Text('Change account name',
+              style: TextStyle(color: tdWhite, fontSize: 18)),
+          content: TextField(
+            controller: nameController,
+            style: const TextStyle(color: tdWhite),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey[800],
+              hintText: 'Enter new name',
+              hintStyle: const TextStyle(color: Colors.grey),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel', style: TextStyle(color: tdWhite)),
+            ),
+            ElevatedButton(
+              onPressed: () => _handleEditUserName(context, nameController),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+              ),
+              child: const Text('Edit', style: TextStyle(color: tdWhite)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _handleEditUserName(
+      BuildContext context, TextEditingController nameController) async {
+    String newUsername = nameController.text.trim();
+    if (newUsername.isNotEmpty && newUsername != _username) {
+      await UserDatabase.instance.updateUserName(
+        _username,
+        newUsername,
+      );
+      _updateUsername(newUsername);
+    }
+    Navigator.of(context).pop();
   }
 }
