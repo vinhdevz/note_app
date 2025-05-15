@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
@@ -53,9 +54,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         automaticallyImplyLeading: false,
         backgroundColor: tdBgColor,
         elevation: 0,
-        title: const Text(
-          'Profile',
-          style: TextStyle(
+        title: Text(
+          'Profile'.tr(),
+          style: const TextStyle(
             color: tdText,
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -65,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -92,10 +93,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Expanded(
               child: ListView(
                 children: [
-                  _buildSectionTitle('Settings'),
+                  _buildSectionTitle('Settings'.tr()),
                   _buildProfileOption(
                     context,
-                    'App Settings',
+                    'App Settings'.tr(),
                     'assets/icons/setting.svg',
                     () {
                       Navigator.push(
@@ -104,34 +105,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     },
                   ),
-                  _buildSectionTitle('Account'),
+                  _buildSectionTitle('Account'.tr()),
                   _buildProfileOption(
                     context,
-                    'Change account name',
+                    'Change account name'.tr(),
                     'assets/icons/user.svg',
                     () => _showChangeNameDialog(context),
                   ),
                   _buildProfileOption(
                     context,
-                    'Change account password',
+                    'Change account password'.tr(),
                     'assets/icons/key.svg',
                     () => _showChangePassDialog(context),
                   ),
                   _buildProfileOption(
                     context,
-                    'Change account image',
+                    'Change account image'.tr(),
                     'assets/icons/camera.svg',
                     () {},
                   ),
-                  _buildSectionTitle('Uptodo'),
+                  _buildSectionTitle('Uptodo'.tr()),
                   _buildProfileOption(
-                    context, 'About Us', 'assets/icons/menu.svg', () {}),
+                    context,
+                    'About Us'.tr(),
+                    'assets/icons/menu.svg',
+                    () {},
+                  ),
                   _buildProfileOption(
-                    context, 'FAQ', 'assets/icons/info-circle.svg', () {}),
+                    context,
+                    'FAQ'.tr(),
+                    'assets/icons/info-circle.svg',
+                    () {},
+                  ),
                   _buildProfileOption(
-                    context, 'Help & Feedback', 'assets/icons/flash.svg', () {}),
+                    context,
+                    'Help & Feedback'.tr(),
+                    'assets/icons/flash.svg',
+                    () {},
+                  ),
                   _buildProfileOption(
-                    context, 'Support Us', 'assets/icons/like.svg', () {}),
+                    context,
+                    'Support Us'.tr(),
+                    'assets/icons/like.svg',
+                    () {},
+                  ),
                   _buildLogout(context),
                 ],
               ),
@@ -144,9 +161,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   List<Widget> _buildTaskStats() {
     return [
-      _buildStatBox('$_uncompletedCount Task left'),
+      _buildStatBox('$_uncompletedCount ${'Task left'.tr()}'),
       const SizedBox(width: 20),
-      _buildStatBox('$_completedCount Task done'),
+      _buildStatBox('$_completedCount ${'Task done'.tr()}'),
     ];
   }
 
@@ -195,9 +212,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildLogout(BuildContext context) {
     return ListTile(
       leading: SvgPicture.asset('assets/icons/logout.svg', width: 24, height: 24),
-      title: const Text(
-        'Log out',
-        style: TextStyle(color: Colors.red, fontSize: 16, fontFamily: 'Lato'),
+      title: Text(
+        'Log out'.tr(),
+        style: const TextStyle(color: Colors.red, fontSize: 16, fontFamily: 'Lato'),
       ),
       onTap: () => _showLogoutDialog(context),
     );
@@ -208,19 +225,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Log out'),
-        content: const Text('Choose how you want to log out.'),
+        title: Text('Log out'.tr()),
+        content: Text('Choose how you want to log out.'.tr()),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               Navigator.of(context).pushReplacementNamed('/login');
             },
-            child: const Text('Keep login info'),
+            child: Text('Keep login info'.tr()),
           ),
           TextButton(
             onPressed: () => _handleClearAndRestart(context),
-            child: const Text('Clear & restart', style: TextStyle(color: Colors.red)),
+            child: Text('Clear & restart'.tr(), style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -240,9 +257,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: Colors.grey[900],
-        title: const Text(
-          'Change account name',
-          style: TextStyle(color: tdWhite, fontSize: 18, fontFamily: 'Lato'),
+        title: Text(
+          'Change account name'.tr(),
+          style: const TextStyle(color: tdWhite, fontSize: 18, fontFamily: 'Lato'),
         ),
         content: TextField(
           controller: nameController,
@@ -250,7 +267,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.grey[800],
-            hintText: 'Enter new name',
+            hintText: 'Enter new name'.tr(),
             hintStyle: const TextStyle(color: Colors.grey, fontFamily: 'Lato'),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
@@ -261,7 +278,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel', style: TextStyle(color: tdWhite, fontSize: 16)),
+            child: Text('Cancel'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
           ),
           ElevatedButton(
             onPressed: () => _handleEditUserName(context, nameController),
@@ -269,7 +286,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               backgroundColor: Colors.deepPurple,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
             ),
-            child: const Text('Edit', style: TextStyle(color: tdWhite, fontSize: 16)),
+            child: Text('Edit'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
           ),
         ],
       ),
@@ -293,19 +310,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: Colors.grey[900],
-        title: const Text('Change account Password', style: TextStyle(color: tdWhite, fontSize: 18)),
+        title: Text('Change account Password'.tr(), style: const TextStyle(color: tdWhite, fontSize: 18)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildPasswordField(oldPasswordController, 'Enter old password'),
+            _buildPasswordField(oldPasswordController, 'Enter old password'.tr()),
             const SizedBox(height: 12),
-            _buildPasswordField(newPasswordController, 'Enter new password'),
+            _buildPasswordField(newPasswordController, 'Enter new password'.tr()),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel', style: TextStyle(color: tdWhite, fontSize: 16)),
+            child: Text('Cancel'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
           ),
           ElevatedButton(
             onPressed: () => _handleChangePassword(
@@ -317,7 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               backgroundColor: tdDarkPurple,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
             ),
-            child: const Text('Edit', style: TextStyle(color: tdWhite, fontSize: 16)),
+            child: Text('Edit'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
           ),
         ],
       ),
@@ -361,7 +378,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (oldPass.isEmpty || newPass.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in both fields')),
+        SnackBar(content: Text('Please fill in both fields'.tr())),
       );
       return;
     }
@@ -375,11 +392,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (success) {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password changed successfully')),
+        SnackBar(content: Text('Password changed successfully'.tr())),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Old password is incorrect')),
+        SnackBar(content: Text('Old password is incorrect'.tr())),
       );
     }
   }

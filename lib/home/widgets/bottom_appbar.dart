@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class BottomAppbar extends StatelessWidget {
   final Function(int) onTabSelected;
@@ -31,7 +32,7 @@ class BottomAppbar extends StatelessWidget {
             ),
             Row(
               children: [
-                _buildTabItem('assets/icons/clock.svg', 'Focuse', 2),
+                _buildTabItem('assets/icons/clock.svg', 'Focus', 2),
                 _buildTabItem('assets/icons/user.svg', 'Profile', 3),
               ],
             ),
@@ -54,12 +55,11 @@ class BottomAppbar extends StatelessWidget {
               iconPath,
               width: 24,
               height: 24,
-              // ignore: deprecated_member_use
               color: isSelected ? tdPurple : Colors.white,
             ),
             const SizedBox(height: 4),
             Text(
-              label,
+              label.tr(),
               style: TextStyle(
                 color: isSelected ? tdPurple : Colors.white,
                 fontSize: 12,

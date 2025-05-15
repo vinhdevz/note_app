@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_todo_app/constants/color.dart';
 import 'package:flutter_todo_app/home/widgets/select_time_dialog.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SelectDateDialog extends StatefulWidget {
   final Function(DateTime) onDateTimeSelected;
@@ -22,25 +23,24 @@ class _SelectDateDialogState extends State<SelectDateDialog> {
   }
 
   void _chooseTime() async {
-  final time = await showDialog<TimeOfDay>(
-    context: context,
-    builder: (_) => SelectTimeDialog(
-      onTimeSelected: (time) => Navigator.of(context).pop(time),
-    ),
-  );
-
-  if (time != null) {
-    final selectedDateTime = DateTime(
-      selectedDate.year,
-      selectedDate.month,
-      selectedDate.day,
-      time.hour,
-      time.minute,
+    final time = await showDialog<TimeOfDay>(
+      context: context,
+      builder: (_) => SelectTimeDialog(
+        onTimeSelected: (time) => Navigator.of(context).pop(time),
+      ),
     );
-    widget.onDateTimeSelected(selectedDateTime);  
-  }
-}
 
+    if (time != null) {
+      final selectedDateTime = DateTime(
+        selectedDate.year,
+        selectedDate.month,
+        selectedDate.day,
+        time.hour,
+        time.minute,
+      );
+      widget.onDateTimeSelected(selectedDateTime);  
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,60 +64,60 @@ class _SelectDateDialogState extends State<SelectDateDialog> {
 
   TableCalendar<dynamic> tableCalendar() {
     return TableCalendar(
-            focusedDay: selectedDate,
-            firstDay: DateTime.utc(2020, 1, 1),
-            lastDay: DateTime.utc(2030, 12, 31),
-            selectedDayPredicate: (day) => isSameDay(day, selectedDate),
-            onDaySelected: _onDaySelected,
-            calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, day, _) => _buildDayCell(day, isSelected: false, isToday: false),
-              selectedBuilder: (context, day, _) => _buildDayCell(day, isSelected: true, isToday: false),
-              todayBuilder: (context, day, _) => _buildDayCell(day, isSelected: false, isToday: true),
-              outsideBuilder: (context, day, _) => _buildDayCell(day, isSelected: false, isToday: false, isOutside: true),
-            ),
-            calendarStyle: const CalendarStyle(isTodayHighlighted: true),
-            headerStyle: HeaderStyle(
-              formatButtonVisible: false,
-              titleCentered: true,
-              titleTextFormatter: (date, _) => '${_monthName(date.month).toUpperCase()}\n${date.year}',
-              titleTextStyle: const TextStyle(color: Colors.white, fontSize: 16, height: 1.4),
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.white30, width: 1)),
-              ),
-              leftChevronIcon: const Icon(Icons.chevron_left, color: Colors.white),
-              rightChevronIcon: const Icon(Icons.chevron_right, color: Colors.white),
-            ),
-            daysOfWeekHeight: 30,
-            daysOfWeekStyle: const DaysOfWeekStyle(
-              weekdayStyle: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-              weekendStyle: TextStyle(color: Color(0xffFF4949), fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-            ),
-          );
+      focusedDay: selectedDate,
+      firstDay: DateTime.utc(2020, 1, 1),
+      lastDay: DateTime.utc(2030, 12, 31),
+      selectedDayPredicate: (day) => isSameDay(day, selectedDate),
+      onDaySelected: _onDaySelected,
+      calendarBuilders: CalendarBuilders(
+        defaultBuilder: (context, day, _) => _buildDayCell(day, isSelected: false, isToday: false),
+        selectedBuilder: (context, day, _) => _buildDayCell(day, isSelected: true, isToday: false),
+        todayBuilder: (context, day, _) => _buildDayCell(day, isSelected: false, isToday: true),
+        outsideBuilder: (context, day, _) => _buildDayCell(day, isSelected: false, isToday: false, isOutside: true),
+      ),
+      calendarStyle: const CalendarStyle(isTodayHighlighted: true),
+      headerStyle: HeaderStyle(
+        formatButtonVisible: false,
+        titleCentered: true,
+        titleTextFormatter: (date, _) => '${_monthName(date.month).toUpperCase()}\n${date.year}',
+        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 16, height: 1.4),
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: Colors.white30, width: 1)),
+        ),
+        leftChevronIcon: const Icon(Icons.chevron_left, color: Colors.white),
+        rightChevronIcon: const Icon(Icons.chevron_right, color: Colors.white),
+      ),
+      daysOfWeekHeight: 30,
+      daysOfWeekStyle: const DaysOfWeekStyle(
+        weekdayStyle: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+        weekendStyle: TextStyle(color: Color(0xffFF4949), fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+      ),
+    );
   }
 
   Widget buttonCalendar(BuildContext context) {
     return Row(
-            children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancel", style: TextStyle(color: tdPurple, fontSize: 16)),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _chooseTime,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: tdPurple,
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                  ),
-                  child: const Text("Choose Time", style: TextStyle(color: tdText, fontSize: 16)),
-                ),
-              ),
-            ],
-          );
+      children: [
+        Expanded(
+          child: TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel".tr(), style: const TextStyle(color: tdPurple, fontSize: 16)),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: _chooseTime,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: tdPurple,
+              minimumSize: const Size.fromHeight(50),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            ),
+            child: Text("Choose Time".tr(), style: const TextStyle(color: tdText, fontSize: 16)),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildDayCell(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/constants/color.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SelectTimeDialog extends StatelessWidget {
   final void Function(TimeOfDay time) onTimeSelected;
@@ -37,9 +38,9 @@ class SelectTimeDialog extends StatelessWidget {
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
-      helpText: 'Choose time',
-      cancelText: 'Cancel',
-      confirmText: 'Save',
+      helpText: 'Choose Time'.tr(),      
+      cancelText: 'Cancel'.tr(),          
+      confirmText: 'Save'.tr(),            
       initialEntryMode: TimePickerEntryMode.input,
       builder: (BuildContext context, Widget? child) {
         if (child == null) return const SizedBox();
@@ -98,8 +99,8 @@ class SelectTimeDialog extends StatelessWidget {
       dayPeriodShape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(4)),
       ),
-      dayPeriodColor: WidgetStateColor.resolveWith((states) {
-        return states.contains(WidgetState.selected)
+      dayPeriodColor: MaterialStateColor.resolveWith((states) {
+        return states.contains(MaterialState.selected)
             ? tdPurple
             : const Color(0xFF1E1E1E);
       }),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
+import 'package:flutter_todo_app/home/language_setting_screen.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SettingScreen extends StatelessWidget {
   const SettingScreen({super.key});
@@ -13,9 +15,9 @@ class SettingScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         backgroundColor: tdBgColor,
         elevation: 0,
-        title: const Text(
-          'Settings',
-          style: TextStyle(
+        title: Text(
+          'Settings'.tr(),
+          style: const TextStyle(
             color: tdWhite,
             fontSize: 20,
             fontWeight: FontWeight.w400,
@@ -31,36 +33,64 @@ class SettingScreen extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsetsGeometry.symmetric(horizontal: 2.0, vertical: 4.0),
+        padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 4.0),
         child: ListView(
           children: [
-            _buildSettingTitle('Settings'),
-            _buildSettingOptions(context, 'Change app color', 'assets/icons/brush.svg'),
-            _buildSettingOptions(context, 'Change app typography', 'assets/icons/text.svg'),
-            _buildSettingOptions(context, 'Change app language', 'assets/icons/language-square.svg'),
-            _buildSettingTitle('Import'),
-            _buildSettingOptions(context, 'Import from Google calendar', 'assets/icons/import.svg'),
+            _buildSettingTitle('Settings'.tr()),
+            _buildSettingOptions(
+              context,
+              'Change app color'.tr(),
+              'assets/icons/brush.svg',
+              onTap: () {},
+            ),
+            _buildSettingOptions(
+              context,
+              'Change app typography'.tr(),
+              'assets/icons/text.svg',
+              onTap: () {},
+            ),
+            _buildSettingOptions(
+              context,
+              'Change app language'.tr(),
+              'assets/icons/language-square.svg',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LanguageSettingScreen()),
+                );
+              },
+            ),
+            _buildSettingTitle('Import'.tr()),
+            _buildSettingOptions(
+              context,
+              'Import from Google calendar'.tr(),
+              'assets/icons/import.svg',
+              onTap: () {},
+            ),
           ],
         ),
       ),
     );
   }
-  
-  _buildSettingOptions(BuildContext context, String title, String icon) {
+
+  Widget _buildSettingOptions(BuildContext context, String title, String icon, {VoidCallback? onTap}) {
     return ListTile(
       leading: SvgPicture.asset(icon, width: 24, height: 24),
       title: Text(
         title,
         style: const TextStyle(
-          color: tdWhite, fontSize: 16, fontWeight: FontWeight.w400, fontFamily: 'Lato',
+          color: tdWhite,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          fontFamily: 'Lato',
         ),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, color: tdWhite, size: 20),
-      onTap: () {},
+      onTap: onTap,
     );
   }
-  
-  _buildSettingTitle(String title) {
+
+  Widget _buildSettingTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
       child: Text(

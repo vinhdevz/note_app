@@ -5,11 +5,12 @@ import 'package:flutter_todo_app/home/widgets/select_date_dialog.dart';
 import 'package:flutter_todo_app/home/widgets/select_priority_dialog.dart';
 import 'package:flutter_todo_app/models/task_model.dart';
 import 'package:flutter_todo_app/database/task_database.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
   final VoidCallback onTaskAdded;
   final TaskModel? existingTask;
-   const AddTaskBottomSheet({
+  const AddTaskBottomSheet({
     super.key,
     required this.onTaskAdded,
     this.existingTask,
@@ -24,10 +25,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   final TextEditingController _descController = TextEditingController();
   DateTime? _selectedDateTime;
   int _priority = 1;
-  
 
-
-  
   @override
   void initState() {
     super.initState();
@@ -39,18 +37,17 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     }
   }
 
-  
   Future<void> _submitTask() async {
     final title = _titleController.text.trim();
     if (title.isEmpty || _selectedDateTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete title and time')),
+        SnackBar(content: Text('PleaseCompleteTitleAndTime'.tr())),
       );
       return;
     }
 
     final updatedTask = TaskModel(
-      id: widget.existingTask?.id,  // Cập nhật id nếu task đã có sẵn
+      id: widget.existingTask?.id,
       title: title,
       description: _descController.text.trim(),
       dateTime: _selectedDateTime!,
@@ -59,23 +56,21 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 
     try {
       if (widget.existingTask != null) {
-        
         await TaskDatabase.instance.updateTask(updatedTask);
       } else {
-    
         await TaskDatabase.instance.createTask(updatedTask);
       }
 
-      widget.onTaskAdded(); 
-      Navigator.pop(context); 
+      widget.onTaskAdded();
+
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving task: $e')),
+        SnackBar(content: Text('ErrorSavingTask'.tr(args: [e.toString()]))),
       );
     }
   }
 
-  
   void _handleIconTap(String action) {
     switch (action) {
       case 'date':
@@ -104,7 +99,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
         );
         break;
       case 'tag':
-       
+        // chưa xử lý
         break;
     }
   }
@@ -121,11 +116,11 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Align(
+          Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Add Task',
-              style: TextStyle(
+              'Add Task'.tr(),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -134,45 +129,44 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
           ),
           const SizedBox(height: 16),
           TextField(
-  controller: _titleController,
-  decoration: InputDecoration(
-    hintText: 'Enter task title',
-    hintStyle: const TextStyle(color: Colors.white70),
-    filled: true,
-    fillColor: tdGrey,
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: Colors.white), // Viền luôn hiển thị
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: Colors.white, width: 1.5),
-    ),
-  ),
-  cursorColor: Colors.white,
-  style: const TextStyle(color: Colors.white),
-),
-const SizedBox(height: 12),
-TextField(
-  controller: _descController,
-  decoration: InputDecoration(
-    hintText: 'Description',
-    hintStyle: const TextStyle(color: Colors.white70),
-    filled: true,
-    fillColor: tdGrey,
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: Colors.white), // Viền luôn hiển thị
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: Colors.white, width: 1.5),
-    ),
-  ),
-  cursorColor: Colors.white,
-  style: const TextStyle(color: Colors.white),
-),
-
+            controller: _titleController,
+            decoration: InputDecoration(
+              hintText: 'Enter task title'.tr(),
+              hintStyle: const TextStyle(color: Colors.white70),
+              filled: true,
+              fillColor: tdGrey,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.white),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.white, width: 1.5),
+              ),
+            ),
+            cursorColor: Colors.white,
+            style: const TextStyle(color: Colors.white),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _descController,
+            decoration: InputDecoration(
+              hintText: 'Description'.tr(),
+              hintStyle: const TextStyle(color: Colors.white70),
+              filled: true,
+              fillColor: tdGrey,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.white),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.white, width: 1.5),
+              ),
+            ),
+            cursorColor: Colors.white,
+            style: const TextStyle(color: Colors.white),
+          ),
           const SizedBox(height: 20),
           Row(
             children: [
@@ -211,7 +205,7 @@ TextField(
               ),
               const Spacer(),
               GestureDetector(
-                onTap: _submitTask,  // Submit task khi nhấn nút gửi
+                onTap: _submitTask,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: SvgPicture.asset(

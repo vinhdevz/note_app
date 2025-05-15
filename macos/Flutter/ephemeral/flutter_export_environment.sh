@@ -1,6 +1,6 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/Users/admin/development/flutter"
+export "FLUTTER_ROOT=/Users/admin/fvm/versions/3.32.0-0.2.pre"
 export "FLUTTER_APPLICATION_PATH=/Users/admin/note_app"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"

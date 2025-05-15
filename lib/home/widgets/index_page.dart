@@ -1,4 +1,5 @@
 // index_page.dart
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
@@ -25,7 +26,7 @@ class IndexPageState extends State<IndexPage> {
   
   void loadTasks() {
     setState(() {
-      _tasksFuture = TaskDatabase.instance.readAllTasks(); // Đọc lại task từ database
+      _tasksFuture = TaskDatabase.instance.readAllTasks();
     });
   }
 
@@ -40,11 +41,11 @@ class IndexPageState extends State<IndexPage> {
         title: Row(
           children: [
             SvgPicture.asset('assets/icons/Home.svg', width: 42, height: 42),
-            const Expanded(
+             Expanded(
               child: Center(
                 child: Text(
-                  'Index',
-                  style: TextStyle(
+                  'Index'.tr(),
+                  style: const TextStyle(
                     color: tdText,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

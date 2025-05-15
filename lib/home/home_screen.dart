@@ -6,7 +6,7 @@ import 'package:flutter_todo_app/home/widgets/index_page.dart';
 import 'package:flutter_todo_app/home/widgets/add_button.dart';
 import 'package:flutter_todo_app/home/widgets/add_task_screen.dart';
 import 'package:flutter_todo_app/database/user_db.dart';
-import 'package:flutter_todo_app/home/profile_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,7 +44,7 @@ class _HomeState extends State<HomeScreen> {
   Widget _getCurrentPage() {
     switch (_currentIndex) {
       case 0:
-        return const IndexPage();
+        return IndexPage(key: _indexPageKey);
       case 1:
         return const Center(
           child: Text('Calendar page', style: TextStyle(color: Colors.white)),
@@ -80,8 +80,10 @@ class _HomeState extends State<HomeScreen> {
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             builder: (context) => AddTaskBottomSheet(
-              onTaskAdded: () {},
-            ),
+    onTaskAdded: () {
+  _indexPageKey.currentState?.loadTasks();
+},
+  ),
           );
         },
       ),
