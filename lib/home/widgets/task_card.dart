@@ -153,7 +153,7 @@ class TaskCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(4),
     ),
     child: Row(
-      mainAxisAlignment: MainAxisAlignment.center, // căn giữa nội dung
+      mainAxisAlignment: MainAxisAlignment.center, 
       children: [
         SvgPicture.asset(
           'assets/icons/flag.svg',
@@ -165,7 +165,7 @@ class TaskCard extends StatelessWidget {
         Flexible(
           child: Text(
             priorityText,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
+            style: const TextStyle(color: Colors.white, fontSize: 14,),
             overflow: TextOverflow.ellipsis,
           ),
         ),

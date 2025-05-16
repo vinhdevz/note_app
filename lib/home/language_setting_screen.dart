@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_todo_app/constants/color.dart';
 
-
-
 class LanguageSettingScreen extends StatelessWidget {
   const LanguageSettingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final languages = [
+      {'name': 'English', 'locale': const Locale('en')},
+      {'name': 'Tiếng Việt', 'locale': const Locale('vi')},
+    ];
+
     return Scaffold(
       backgroundColor: tdBgColor,
       appBar: AppBar(
@@ -19,35 +22,23 @@ class LanguageSettingScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: ListView(
-          children: [
-            ListTile(
-  title: const Text("English", style: TextStyle(color: tdWhite)),
-  trailing: context.locale.languageCode == 'en'
-      ? const Icon(Icons.check, color: tdWhite)
-      : null,
-  onTap: () async {
-    await context.setLocale(const Locale('en'));
-    await Future.delayed(const Duration(milliseconds: 100));
-    if (context.mounted) {
-      Navigator.pop(context);
-    }
-  },
-),
-ListTile(
-  title: const Text("Tiếng Việt", style: TextStyle(color: tdWhite)),
-  trailing: context.locale.languageCode == 'vi'
-      ? const Icon(Icons.check, color: tdWhite)
-      : null,
-  onTap: () async {
-    await context.setLocale(const Locale('vi'));
-    await Future.delayed(const Duration(milliseconds: 100));
-    if (context.mounted) {
-      Navigator.pop(context);
-    }
-  },
-),
-
-          ],
+          children: languages.map((lang) {
+            final isSelected = context.locale == lang['locale'];
+            return ListTile(
+              title: Text(
+                lang['name'] as String,
+                style: const TextStyle(color: tdWhite),
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check, color: tdWhite)
+                  : null,
+              onTap: () async {
+                await context.setLocale(lang['locale'] as Locale);
+                await Future.delayed(const Duration(milliseconds: 100));
+                if (context.mounted) Navigator.pop(context);
+              },
+            );
+          }).toList(),
         ),
       ),
     );
