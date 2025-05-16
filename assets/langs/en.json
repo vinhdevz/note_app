@@ -41,6 +41,9 @@
   "Task Priority": "Task Priority",
   "Easy": "Easy",
   "Normal": "Normal",
-  "Hard": "Hard"
+  "Hard": "Hard",
+  "Take picture": "Take picture",
+  "Import from gallery": "Import from gallery",
+  "Import from Google Drive":"Import from Google Drive"
 
 }
