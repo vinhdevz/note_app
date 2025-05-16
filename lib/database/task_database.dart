@@ -60,7 +60,11 @@ class TaskDatabase {
 
   Future<List<TaskModel>> readAllTasks() async {
     final db = await instance.database;
-    final result = await db.query('tasks', orderBy: 'dateTime ASC');
+    final result = await db.query(
+  'tasks',
+  orderBy: 'priority DESC, dateTime ASC',
+);
+
     return result.map((map) => TaskModel.fromMap(map)).toList();
   }
 

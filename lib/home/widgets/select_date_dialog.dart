@@ -65,7 +65,7 @@ class _SelectDateDialogState extends State<SelectDateDialog> {
   TableCalendar<dynamic> tableCalendar() {
     return TableCalendar(
       focusedDay: selectedDate,
-      firstDay: DateTime.utc(2020, 1, 1),
+     firstDay: DateTime.now(),
       lastDay: DateTime.utc(2030, 12, 31),
       selectedDayPredicate: (day) => isSameDay(day, selectedDate),
       onDaySelected: _onDaySelected,
