@@ -117,57 +117,63 @@ class TaskCard extends StatelessWidget {
   }
 
   Widget priorityInTask() {
-    Color bgColor;
-    Color iconColor;
+  Color bgColor;
+  Color iconColor;
 
-    switch (task.priority) {
-      case 1:
-        bgColor = priEasy;
-        iconColor = iconEasy;
-        break;
-      case 2:
-        bgColor = priNormal;
-        iconColor = iconNormal;
-        break;
-      case 3:
-        bgColor = priHard;
-        iconColor = iconHard;
-        break;
-      default:
-        bgColor = Colors.grey;
-        iconColor = Colors.grey;
-    }
+  switch (task.priority) {
+    case 1:
+      bgColor = priEasy;
+      iconColor = iconEasy;
+      break;
+    case 2:
+      bgColor = priNormal;
+      iconColor = iconNormal;
+      break;
+    case 3:
+      bgColor = priHard;
+      iconColor = iconHard;
+      break;
+    default:
+      bgColor = Colors.grey;
+      iconColor = Colors.grey;
+  }
 
-    String priorityText = task.priority == 1
-        ? 'Easy'.tr()
-        : task.priority == 2
-            ? 'Normal'.tr()
-            : 'Hard'.tr();
+  String priorityText = task.priority == 1
+      ? 'Easy'.tr()
+      : task.priority == 2
+          ? 'Normal'.tr()
+          : 'Hard'.tr();
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-      decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        children: [
-          SvgPicture.asset(
-            'assets/icons/flag.svg',
-            width: 16,
-            height: 16,
-            colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-          ),
-          const SizedBox(width: 4),
-          Text(
+  return Container(
+    width: 125, 
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+    decoration: BoxDecoration(
+      color: bgColor,
+      border: Border.all(color: Colors.black),
+      borderRadius: BorderRadius.circular(4),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center, // căn giữa nội dung
+      children: [
+        SvgPicture.asset(
+          'assets/icons/flag.svg',
+          width: 16,
+          height: 16,
+          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+        ),
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
             priorityText,
             style: const TextStyle(color: Colors.white, fontSize: 14),
+            overflow: TextOverflow.ellipsis,
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
 
   Widget time(BuildContext context) {
     return Row(

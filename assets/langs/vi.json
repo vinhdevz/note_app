@@ -42,8 +42,10 @@
    "Task Priority": "Độ ưu tiên công việc",
   "Easy": "Dễ",
   "Normal": "Bình thường",
-  "Hard": "Khó"
-
+  "Hard": "Khó",
+  "Take picture": "Chụp ảnh",
+  "Import from gallery": "Chọn từ thư viện",
+  "Import from Google Drive":"Nhập từ Google Drive"
 
 
 }
