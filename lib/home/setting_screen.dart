@@ -57,7 +57,7 @@ class _SettingScreenState extends State<SettingScreen> {
             _buildSettingOptions(
               context,
               'Change app language'.tr(),
-              'assets/icons/language-square.svg',
+              'assets/icons/language_square.svg',
               onTap: () async {
                 await Navigator.push(
                   context,

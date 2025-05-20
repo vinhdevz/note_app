@@ -17,7 +17,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeState extends State<HomeScreen> {
   final GlobalKey<IndexPageState> _indexPageKey = GlobalKey<IndexPageState>();
   int _currentIndex = 0;
-  final List<String> _titles = ['Index', 'Calendar', 'Focus', 'Profile'];
   List<String> tasks = [];
   String? _userName;
 
@@ -64,35 +63,46 @@ class _HomeState extends State<HomeScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: tdBgColor,
-      body: _getCurrentPage(),
-      floatingActionButton: FloatingAddButton(
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: tdGrey,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            builder: (context) => AddTaskBottomSheet(
-    onTaskAdded: () {
-  _indexPageKey.currentState?.loadTasks();
-},
-  ),
-          );
-        },
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppbar(
-        currentIndex: _currentIndex,
-        onTabSelected: _onTabSelected,
-      ),
-    );
-  }
+ @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    extendBody: true, 
+    backgroundColor: tdBgColor,
+    body: _getCurrentPage(),
+
+   
+    bottomNavigationBar: Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        BottomAppbar(
+          currentIndex: _currentIndex,
+          onTabSelected: _onTabSelected,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 76), 
+          child: FloatingAddButton(
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: tdGrey,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                builder: (context) => AddTaskBottomSheet(
+                 onTaskAdded: () {
+    _indexPageKey.currentState?.refreshAll(); 
+  },
+
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
   void _handleLogout() async {
     Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);

@@ -4,7 +4,8 @@ class TaskModel {
   final String description;
   final DateTime dateTime;
   final int priority;
-  final bool isCompleted; // ✅ Thêm trường này
+  final bool isCompleted;
+  final int? categoryId; // ✅ Thêm dòng này
 
   TaskModel({
     this.id,
@@ -12,7 +13,8 @@ class TaskModel {
     required this.description,
     required this.dateTime,
     required this.priority,
-    this.isCompleted = false, // ✅ Mặc định là false
+    this.isCompleted = false,
+    this.categoryId, // ✅ Thêm dòng này
   });
 
   Map<String, dynamic> toMap() {
@@ -22,7 +24,8 @@ class TaskModel {
       'description': description,
       'dateTime': dateTime.toIso8601String(),
       'priority': priority,
-      'isCompleted': isCompleted ? 1 : 0, // ✅ bool -> int
+      'isCompleted': isCompleted ? 1 : 0,
+      'categoryId': categoryId, // ✅ Thêm dòng này
     };
   }
 
@@ -33,11 +36,11 @@ class TaskModel {
       description: map['description'],
       dateTime: DateTime.parse(map['dateTime']),
       priority: map['priority'],
-      isCompleted: map['isCompleted'] == 1, // ✅ int -> bool
+      isCompleted: map['isCompleted'] == 1,
+      categoryId: map['categoryId'], // ✅ Thêm dòng này
     );
   }
 
-  // ✅ Hàm copy để update
   TaskModel copyWith({
     int? id,
     String? title,
@@ -45,6 +48,7 @@ class TaskModel {
     DateTime? dateTime,
     int? priority,
     bool? isCompleted,
+    int? categoryId, // ✅ Thêm dòng này
   }) {
     return TaskModel(
       id: id ?? this.id,
@@ -53,6 +57,7 @@ class TaskModel {
       dateTime: dateTime ?? this.dateTime,
       priority: priority ?? this.priority,
       isCompleted: isCompleted ?? this.isCompleted,
+      categoryId: categoryId ?? this.categoryId, // ✅ Thêm dòng này
     );
   }
 }

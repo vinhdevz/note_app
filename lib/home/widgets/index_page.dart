@@ -3,9 +3,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
+import 'package:flutter_todo_app/home/widgets/create_category_screen.dart';
 import 'package:flutter_todo_app/models/task_model.dart';
 import 'package:flutter_todo_app/home/widgets/task_card.dart';
 import 'package:flutter_todo_app/database/task_database.dart';
+import 'package:flutter_todo_app/models/category_model.dart';
 
 class IndexPage extends StatefulWidget {
   const IndexPage({super.key});
@@ -16,17 +18,32 @@ class IndexPage extends StatefulWidget {
 
 class IndexPageState extends State<IndexPage> {
   late Future<List<TaskModel>> _tasksFuture;
+   List<CategoryModel> _categories = []; 
+
+
+void refreshAll() {
+  loadTasks();
+  loadCategories();
+}
+
 
   @override
   void initState() {
     super.initState();
     loadTasks(); 
+     loadCategories(); 
   }
 
   
   void loadTasks() {
     setState(() {
       _tasksFuture = TaskDatabase.instance.readAllTasks();
+    });
+  }
+  void loadCategories() async {
+    final cats = await TaskDatabase.instance.readAllCategories(); 
+    setState(() {
+      _categories = cats;
     });
   }
 
@@ -75,11 +92,25 @@ class IndexPageState extends State<IndexPage> {
               padding: const EdgeInsets.only(top: 20),
               itemCount: tasks.length,
               itemBuilder: (context, index) {
-                return TaskCard(
-                  task: tasks[index],
-                  onDelete: loadTasks, 
-                );
-              },
+  final task = tasks[index];
+
+  CategoryModel? category;
+  for (var c in _categories) {
+    if (c.id == task.categoryId) {
+      category = c;
+      break;
+    }
+  }
+
+  return TaskCard(
+    task: task,
+    onDelete: loadTasks,
+    category: category,
+  );
+},
+
+
+
             );
           }
         },
