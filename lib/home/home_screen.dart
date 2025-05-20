@@ -8,7 +8,7 @@ import 'package:flutter_todo_app/home/widgets/add_task_screen.dart';
 import 'package:flutter_todo_app/database/user_db.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, required String username});
 
   @override
   State<HomeScreen> createState() => _HomeState();

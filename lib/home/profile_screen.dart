@@ -7,10 +7,11 @@ import 'package:flutter_todo_app/home/setting_screen.dart';
 import 'package:flutter_todo_app/database/task_database.dart';
 import 'package:image_picker/image_picker.dart';
 import '../database/user_db.dart';
+import 'dart:developer' as developer;
 
 class ProfileScreen extends StatefulWidget {
   final String? username;
-  final VoidCallback onLogout;
+  final void Function() onLogout;
 
   const ProfileScreen({
     super.key,
@@ -23,41 +24,76 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late String _username;
+  String _fullname = 'Guest';
   int _completedCount = 0;
   int _uncompletedCount = 0;
-   File? _selectedImage;
+  File? _selectedImage;
+  String? _imagePath;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _username = widget.username ?? 'Dovinh';
-    _loadTaskStats();
+    _loadUserData();
   }
 
-  Future<void> _loadTaskStats() async {
-    final stats = await TaskDatabase.instance.loadTaskStats();
+  Future<void> _loadUserData() async {
     setState(() {
-      _completedCount = stats['completed'] ?? 0;
-      _uncompletedCount = stats['uncompleted'] ?? 0;
+      _isLoading = true;
     });
+
+    try {
+      final fullnameFuture = UserDatabase.instance.getFullName(widget.username ?? '');
+      final statsFuture = TaskDatabase.instance.loadTaskStats();
+      final imagePathFuture = UserDatabase.instance.getProfileImage(widget.username ?? '');
+
+      final results = await Future.wait([fullnameFuture, statsFuture, imagePathFuture]);
+
+      setState(() {
+        _fullname = results[0] as String? ?? 'Guest';
+        final stats = results[1] as Map<String, int>;
+        _completedCount = stats['completed'] ?? 0;
+        _uncompletedCount = stats['uncompleted'] ?? 0;
+        final imagePath = results[2] as String?;
+        if (imagePath != null && imagePath.isNotEmpty && File(imagePath).existsSync()) {
+          _imagePath = imagePath;
+        }
+      });
+    } catch (e) {
+      developer.log('Error loading user data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading profile data'.tr())),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
-  void _updateUsername(String newUsername) {
-    setState(() {
-      _username = newUsername;
-    });
-  }
-  void _pickImage(ImageSource source) async {
+  Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: source);
     if (pickedImage != null) {
       setState(() {
         _selectedImage = File(pickedImage.path);
+        _imagePath = pickedImage.path;
       });
+      await UserDatabase.instance.updateProfileImage(widget.username ?? '', pickedImage.path);
+      developer.log('Image saved to database for user: ${widget.username}');
     }
   }
-void _showImageSourceSheet(BuildContext context) {
+
+  Future<void> _removeProfileImage() async {
+    await UserDatabase.instance.updateProfileImage(widget.username ?? '', '');
+    setState(() {
+      _selectedImage = null;
+      _imagePath = null;
+    });
+    developer.log('Profile image removed for user: ${widget.username}');
+  }
+
+  void _showImageSourceSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.grey[900],
@@ -70,16 +106,18 @@ void _showImageSourceSheet(BuildContext context) {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-            Text(
+              Text(
                 'Change account image'.tr(),
                 style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold, color: tdWhite),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: tdWhite,
+                ),
               ),
               const SizedBox(height: 16),
               ListTile(
                 leading: const Icon(Icons.camera_alt, color: tdWhite),
-                title: Text('Take picture'.tr(),
-                    style: const TextStyle(color: tdWhite)),
+                title: Text('Take picture'.tr(), style: const TextStyle(color: tdWhite)),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(ImageSource.camera);
@@ -87,8 +125,7 @@ void _showImageSourceSheet(BuildContext context) {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library, color: tdWhite),
-                title: Text('Import from gallery'.tr(),
-                    style: const TextStyle(color: tdWhite)),
+                title: Text('Import from gallery'.tr(), style: const TextStyle(color: tdWhite)),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(ImageSource.gallery);
@@ -96,15 +133,20 @@ void _showImageSourceSheet(BuildContext context) {
               ),
               ListTile(
                 leading: const Icon(Icons.drive_folder_upload, color: tdWhite),
-                title: Text('Import from Google Drive'.tr(),
-                    style: const TextStyle(color: tdWhite)),
+                title: Text('Import from Google Drive'.tr(), style: const TextStyle(color: tdWhite)),
                 onTap: () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content:
-                            Text('Google Drive integration not implemented')),
+                    const SnackBar(content: Text('Google Drive integration not implemented')),
                   );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: Text('Remove profile image'.tr(), style: const TextStyle(color: Colors.red)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _removeProfileImage();
                 },
               ),
             ],
@@ -113,7 +155,6 @@ void _showImageSourceSheet(BuildContext context) {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -134,163 +175,116 @@ void _showImageSourceSheet(BuildContext context) {
         ),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              backgroundImage: _selectedImage != null
-                  ? FileImage(_selectedImage!)
-                  : const AssetImage('assets/images/avatar.png')
-                      as ImageProvider,
-              radius: 50,
-            ),
-
-            const SizedBox(height: 10),
-            Text(
-              _username,
-              style: const TextStyle(
-                color: tdWhite,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Lato',
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: _buildTaskStats(),
-            ),
-            const SizedBox(height: 32),
-            Expanded(
-              child: ListView(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: tdPurple))
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _buildSectionTitle('Settings'.tr()),
-                  _buildProfileOption(
-                    context,
-                    'App Settings'.tr(),
-                    'assets/icons/setting.svg',
-                    () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const SettingScreen()),
-                      );
-                    },
+                  GestureDetector(
+                    onTap: () => _showImageSourceSheet(context),
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.grey[300],
+                      backgroundImage: _getProfileImage(),
+                      child: _getProfileImage() == null
+                          ? const Icon(Icons.person, size: 50, color: Colors.grey)
+                          : null,
+                    ),
                   ),
-                  _buildSectionTitle('Account'.tr()),
-                  _buildProfileOption(
-                    context,
-                    'Change account name'.tr(),
-                    'assets/icons/user.svg',
-                    () => _showChangeNameDialog(context),
+                  const SizedBox(height: 10),
+                  Text(
+                    _fullname,
+                    style: const TextStyle(
+                      color: tdWhite,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Lato',
+                    ),
                   ),
-                  _buildProfileOption(
-                    context,
-                    'Change account password'.tr(),
-                    'assets/icons/key.svg',
-                    () => _showChangePassDialog(context),
+                  const SizedBox(height: 20),
+                  TaskStats(
+                    uncompletedCount: _uncompletedCount,
+                    completedCount: _completedCount,
                   ),
-                  _buildProfileOption(
-                    context,
-                    'Change account image'.tr(),
-                    'assets/icons/camera.svg',
-                    () => _showImageSourceSheet(context),
+                  const SizedBox(height: 32),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        SectionTitle(title: 'Settings'.tr()),
+                        ProfileOption(
+                          title: 'App Settings'.tr(),
+                          iconPath: 'assets/icons/setting.svg',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const SettingScreen()),
+                            );
+                          },
+                        ),
+                        SectionTitle(title: 'Account'.tr()),
+                        ProfileOption(
+                          title: 'Change full name'.tr(),
+                          iconPath: 'assets/icons/user.svg',
+                          onTap: () => _showChangeNameDialog(context),
+                        ),
+                        ProfileOption(
+                          title: 'Change account password'.tr(),
+                          iconPath: 'assets/icons/key.svg',
+                          onTap: () => _showChangePassDialog(context),
+                        ),
+                        ProfileOption(
+                          title: 'Change account image'.tr(),
+                          iconPath: 'assets/icons/camera.svg',
+                          onTap: () => _showImageSourceSheet(context),
+                        ),
+                        SectionTitle(title: 'Uptodo'.tr()),
+                        ProfileOption(
+                          title: 'About Us'.tr(),
+                          iconPath: 'assets/icons/menu.svg',
+                          onTap: () {},
+                        ),
+                        ProfileOption(
+                          title: 'FAQ'.tr(),
+                          iconPath: 'assets/icons/info-circle.svg',
+                          onTap: () {},
+                        ),
+                        ProfileOption(
+                          title: 'Help & Feedback'.tr(),
+                          iconPath: 'assets/icons/flash.svg',
+                          onTap: () {},
+                        ),
+                        ProfileOption(
+                          title: 'Support Us'.tr(),
+                          iconPath: 'assets/icons/like.svg',
+                          onTap: () {},
+                        ),
+                        ListTile(
+                          leading: SvgPicture.asset('assets/icons/logout.svg', width: 24, height: 24),
+                          title: Text(
+                            'Log out'.tr(),
+                            style: const TextStyle(color: Colors.red, fontSize: 16, fontFamily: 'Lato'),
+                          ),
+                          onTap: () => _showLogoutDialog(context),
+                        ),
+                      ],
+                    ),
                   ),
-                  _buildSectionTitle('Uptodo'.tr()),
-                  _buildProfileOption(
-                    context,
-                    'About Us'.tr(),
-                    'assets/icons/menu.svg',
-                    () {},
-                  ),
-                  _buildProfileOption(
-                    context,
-                    'FAQ'.tr(),
-                    'assets/icons/info-circle.svg',
-                    () {},
-                  ),
-                  _buildProfileOption(
-                    context,
-                    'Help & Feedback'.tr(),
-                    'assets/icons/flash.svg',
-                    () {},
-                  ),
-                  _buildProfileOption(
-                    context,
-                    'Support Us'.tr(),
-                    'assets/icons/like.svg',
-                    () {},
-                  ),
-                  _buildLogout(context),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
-  List<Widget> _buildTaskStats() {
-    return [
-      _buildStatBox('$_uncompletedCount ${'Task left'.tr()}'),
-      const SizedBox(width: 20),
-      _buildStatBox('$_completedCount ${'Task done'.tr()}'),
-    ];
-  }
-
-  Widget _buildStatBox(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.grey[800],
-        borderRadius: BorderRadius.circular(2),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(color: tdWhite, fontSize: 14, fontFamily: 'Lato'),
-      ),
-    );
-  }
-
-  Widget _buildProfileOption(
-      BuildContext context, String title, String iconPath, VoidCallback onTap) {
-    return ListTile(
-      leading: SvgPicture.asset(iconPath, width: 24, height: 24),
-      title: Text(
-        title,
-        style: const TextStyle(color: tdWhite, fontSize: 16, fontFamily: 'Lato'),
-      ),
-      trailing: const Icon(Icons.arrow_forward_ios, color: tdWhite, size: 16),
-      onTap: onTap,
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: tdWhite,
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          fontFamily: 'Lato',
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLogout(BuildContext context) {
-    return ListTile(
-      leading: SvgPicture.asset('assets/icons/logout.svg', width: 24, height: 24),
-      title: Text(
-        'Log out'.tr(),
-        style: const TextStyle(color: Colors.red, fontSize: 16, fontFamily: 'Lato'),
-      ),
-      onTap: () => _showLogoutDialog(context),
-    );
+  ImageProvider? _getProfileImage() {
+    if (_selectedImage != null) {
+      return FileImage(_selectedImage!);
+    }
+    if (_imagePath != null && _imagePath!.isNotEmpty && File(_imagePath!).existsSync()) {
+      return FileImage(File(_imagePath!));
+    }
+    return const AssetImage('assets/images/avatar.png');
   }
 
   void _showLogoutDialog(BuildContext context) {
@@ -302,14 +296,21 @@ void _showImageSourceSheet(BuildContext context) {
         content: Text('Choose how you want to log out.'.tr()),
         actions: [
           TextButton(
-            onPressed: () {
+            onPressed: () async {
+              await UserDatabase.instance.saveLoginState(widget.username ?? '');
               Navigator.of(context).pop();
+              widget.onLogout();
               Navigator.of(context).pushReplacementNamed('/login');
             },
             child: Text('Keep login info'.tr()),
           ),
           TextButton(
-            onPressed: () => _handleClearAndRestart(context),
+            onPressed: () async {
+              await UserDatabase.instance.clearLoginState();
+              Navigator.of(context).pop();
+              widget.onLogout();
+              Navigator.of(context).pushNamedAndRemoveUntil('/intro', (route) => false);
+            },
             child: Text('Clear & restart'.tr(), style: const TextStyle(color: Colors.red)),
           ),
         ],
@@ -317,21 +318,15 @@ void _showImageSourceSheet(BuildContext context) {
     );
   }
 
-  void _handleClearAndRestart(BuildContext context) async {
-    await UserDatabase.instance.clearLoginState();
-    Navigator.of(context).pop();
-    Navigator.of(context).pushNamedAndRemoveUntil('/intro', (route) => false);
-  }
-
   void _showChangeNameDialog(BuildContext context) {
-    final nameController = TextEditingController(text: _username);
+    final nameController = TextEditingController(text: _fullname);
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: Colors.grey[900],
         title: Text(
-          'Change account name'.tr(),
+          'Change full name'.tr(),
           style: const TextStyle(color: tdWhite, fontSize: 18, fontFamily: 'Lato'),
         ),
         content: TextField(
@@ -340,7 +335,7 @@ void _showImageSourceSheet(BuildContext context) {
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.grey[800],
-            hintText: 'Enter new name'.tr(),
+            hintText: 'Enter new full name'.tr(),
             hintStyle: const TextStyle(color: Colors.grey, fontFamily: 'Lato'),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
@@ -354,7 +349,16 @@ void _showImageSourceSheet(BuildContext context) {
             child: Text('Cancel'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
           ),
           ElevatedButton(
-            onPressed: () => _handleEditUserName(context, nameController),
+            onPressed: () async {
+              final newFullname = nameController.text.trim();
+              if (newFullname.isNotEmpty && newFullname != _fullname) {
+                await UserDatabase.instance.updateFullName(widget.username ?? '', newFullname);
+                setState(() {
+                  _fullname = newFullname;
+                });
+              }
+              Navigator.of(context).pop();
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
@@ -364,15 +368,6 @@ void _showImageSourceSheet(BuildContext context) {
         ],
       ),
     );
-  }
-
-  void _handleEditUserName(BuildContext context, TextEditingController controller) async {
-    final newUsername = controller.text.trim();
-    if (newUsername.isNotEmpty && newUsername != _username) {
-      await UserDatabase.instance.updateUserName(_username, newUsername);
-      _updateUsername(newUsername);
-    }
-    Navigator.of(context).pop();
   }
 
   void _showChangePassDialog(BuildContext context) {
@@ -398,11 +393,35 @@ void _showImageSourceSheet(BuildContext context) {
             child: Text('Cancel'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
           ),
           ElevatedButton(
-            onPressed: () => _handleChangePassword(
-              context,
-              oldPasswordController,
-              newPasswordController,
-            ),
+            onPressed: () async {
+              final oldPass = oldPasswordController.text.trim();
+              final newPass = newPasswordController.text.trim();
+
+              if (oldPass.isEmpty || newPass.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Please fill in both fields'.tr())),
+                );
+                return;
+              }
+
+              final success = await UserDatabase.instance.updatePassWord(
+                userName: widget.username ?? '',
+                oldPassWord: oldPass,
+                newPassWord: newPass,
+              );
+
+              if (success) {
+                await UserDatabase.instance.saveLoginState(widget.username ?? '');
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Password changed successfully'.tr())),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Old password is incorrect'.tr())),
+                );
+              }
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: tdDarkPurple,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
@@ -440,37 +459,96 @@ void _showImageSourceSheet(BuildContext context) {
       ),
     );
   }
+}
 
-  void _handleChangePassword(
-    BuildContext context,
-    TextEditingController oldController,
-    TextEditingController newController,
-  ) async {
-    final oldPass = oldController.text.trim();
-    final newPass = newController.text.trim();
+class TaskStats extends StatelessWidget {
+  final int uncompletedCount;
+  final int completedCount;
 
-    if (oldPass.isEmpty || newPass.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill in both fields'.tr())),
-      );
-      return;
-    }
+  const TaskStats({
+    super.key,
+    required this.uncompletedCount,
+    required this.completedCount,
+  });
 
-    final success = await UserDatabase.instance.updatePassWord(
-      userName: _username,
-      oldPassWord: oldPass,
-      newPassWord: newPass,
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        StatBox(text: '$uncompletedCount ${'Task left'.tr()}'),
+        const SizedBox(width: 20),
+        StatBox(text: '$completedCount ${'Task done'.tr()}'),
+      ],
     );
+  }
+}
 
-    if (success) {
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password changed successfully'.tr())),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Old password is incorrect'.tr())),
-      );
-    }
+class StatBox extends StatelessWidget {
+  final String text;
+
+  const StatBox({super.key, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.grey[800],
+        borderRadius: BorderRadius.circular(2),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(color: tdWhite, fontSize: 14, fontFamily: 'Lato'),
+      ),
+    );
+  }
+}
+
+class ProfileOption extends StatelessWidget {
+  final String title;
+  final String iconPath;
+  final VoidCallback onTap;
+
+  const ProfileOption({
+    super.key,
+    required this.title,
+    required this.iconPath,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: SvgPicture.asset(iconPath, width: 24, height: 24),
+      title: Text(
+        title,
+        style: const TextStyle(color: tdWhite, fontSize: 16, fontFamily: 'Lato'),
+      ),
+      trailing: const Icon(Icons.arrow_forward_ios, color: tdWhite, size: 16),
+      onTap: onTap,
+    );
+  }
+}
+
+class SectionTitle extends StatelessWidget {
+  final String title;
+
+  const SectionTitle({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: tdWhite,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          fontFamily: 'Lato',
+        ),
+      ),
+    );
   }
 }

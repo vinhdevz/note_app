@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
 import 'package:flutter_todo_app/database/user_db.dart';
 import 'package:flutter_todo_app/login/login_screen.dart';
@@ -16,6 +16,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final fullnameController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
@@ -24,11 +25,68 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
+    fullnameController.dispose();
     usernameController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
   }
+
+  Future<void> _handleRegister() async {
+    developer.log('Register button pressed');
+    if (!_formKey.currentState!.validate()) {
+      developer.log('Form validation failed');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fix the errors in the form')),
+      );
+      return;
+    }
+
+    developer.log('Form validated');
+    final result = await UserDatabase.instance.insertUser(
+      usernameController.text,
+      passwordController.text,
+      fullnameController.text,
+    );
+
+    developer.log('Insert user result: $result');
+    if (result == 'success') {
+      await UserDatabase.instance.saveLoginState(usernameController.text);
+      developer.log('Showing success SnackBar');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registration successful')),
+      );
+      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) {
+        developer.log('Navigating to LoginScreen');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      }
+    } else {
+      developer.log('Showing failure SnackBar: $result');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result)),
+      );
+    }
+  }
+
+  TextStyle _labelStyle() => const TextStyle(
+        color: tdWhite,
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        fontFamily: 'Lato',
+      );
+
+  InputDecoration _inputDecoration(String hint) => InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: tdGrey2),
+        enabledBorder:
+            const OutlineInputBorder(borderSide: BorderSide(color: tdGrey2)),
+        focusedBorder:
+            const OutlineInputBorder(borderSide: BorderSide(color: tdPurple)),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +113,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   fontFamily: 'Lato',
                 ),
               ),
+
               const SizedBox(height: 24),
+              Text('Full name', style: _labelStyle()),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: fullnameController,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Full name is required'
+                    : null,
+                decoration: _inputDecoration('Enter your full name'),
+                style: const TextStyle(color: tdWhite),
+              ),
+
+              const SizedBox(height: 26),
               Text('Username', style: _labelStyle()),
               const SizedBox(height: 8),
               TextFormField(
@@ -63,9 +134,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 validator: (value) => value == null || value.isEmpty
                     ? 'Username is required'
                     : null,
-                decoration: _inputDecoration('Enter your Username'),
+                decoration: _inputDecoration('Enter your username'),
                 style: const TextStyle(color: tdWhite),
               ),
+
               const SizedBox(height: 26),
               Text('Password', style: _labelStyle()),
               const SizedBox(height: 8),
@@ -90,6 +162,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 style: const TextStyle(color: tdWhite),
               ),
+
               const SizedBox(height: 26),
               Text('Confirm Password', style: _labelStyle()),
               const SizedBox(height: 8),
@@ -120,6 +193,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 style: const TextStyle(color: tdWhite),
               ),
+
               const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: _handleRegister,
@@ -132,6 +206,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 child: const Text('Register', style: TextStyle(color: tdWhite)),
               ),
+
               const SizedBox(height: 32),
               const Row(
                 children: [
@@ -143,6 +218,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Expanded(child: Divider(color: tdGrey2)),
                 ],
               ),
+
               const SizedBox(height: 24),
               OutlinedButton.icon(
                 onPressed: () {},
@@ -158,6 +234,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 18),
               OutlinedButton.icon(
                 onPressed: () {},
@@ -173,6 +250,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 46),
               Center(
                 child: GestureDetector(
@@ -208,58 +286,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-
-  Future<void> _handleRegister() async {
-    developer.log('Register button pressed');
-    if (!_formKey.currentState!.validate()) {
-      developer.log('Form validation failed');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fix the errors in the form')),
-      );
-      return;
-    }
-    developer.log('Form validated');
-    bool success = await UserDatabase.instance.insertUser(
-      usernameController.text,
-      passwordController.text,
-    );
-    developer.log('Insert user result: $success');
-    if (success) {
-      developer.log('Showing success SnackBar');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful')),
-      );
-      await Future.delayed(const Duration(seconds: 2));
-      developer.log('Navigating to LoginScreen');
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
-      }
-    } else {
-      developer.log('Showing failure SnackBar');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Username already exists')),
-      );
-    }
-  }
-
-  TextStyle _labelStyle() => const TextStyle(
-        color: tdWhite,
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        fontFamily: 'Lato',
-      );
-
-  InputDecoration _inputDecoration(String hint) => InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: tdGrey2),
-        enabledBorder:
-            const OutlineInputBorder(borderSide: BorderSide(color: tdGrey2)),
-        focusedBorder:
-            const OutlineInputBorder(borderSide: BorderSide(color: tdPurple)),
-      );
 }
-
-

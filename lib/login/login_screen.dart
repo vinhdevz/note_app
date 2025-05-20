@@ -26,23 +26,22 @@ class _LoginScreenState extends State<LoginScreen> {
     _loadSavedLogin();
   }
 
-Future<void> _loadSavedLogin() async {
-  final savedData = await UserDatabase.instance.getSavedLogin();
-  if (savedData != null) {
-    usernameController.text = savedData['username'] ?? '';
-    passwordController.text = savedData['password'] ?? '';
-    setState(() {
-      rememberMe = true;
-    });
+  Future<void> _loadSavedLogin() async {
+    final savedData = await UserDatabase.instance.getSavedLogin();
+    if (savedData != null) {
+      usernameController.text = savedData['username'] ?? '';
+      passwordController.text = ''; 
+      setState(() {
+        rememberMe = true;
+      });
+    }
   }
-}
-
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final username = usernameController.text;
-    final password = passwordController.text;
+    final username = usernameController.text.trim();
+    final password = passwordController.text.trim();
 
     final isValid = await UserDatabase.instance.checkLogin(username, password);
 
@@ -53,8 +52,9 @@ Future<void> _loadSavedLogin() async {
       return;
     }
 
+    final fullname = await UserDatabase.instance.getFullName(username);
     if (rememberMe) {
-      await UserDatabase.instance.saveLoginState(username, password);
+      await UserDatabase.instance.saveLoginState(username);
     } else {
       await UserDatabase.instance.clearLoginState();
     }
@@ -65,7 +65,7 @@ Future<void> _loadSavedLogin() async {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
+      MaterialPageRoute(builder: (context) => HomeScreen(username: username)),
     );
   }
 
@@ -95,36 +95,24 @@ Future<void> _loadSavedLogin() async {
                 ),
               ),
               const SizedBox(height: 52),
-              const Text('Username', style: TextStyle(color: tdWhite)),
+              _buildLabel('Username'),
               const SizedBox(height: 8),
               TextFormField(
                 controller: usernameController,
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Username is required'
-                    : null,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your Username',
-                  hintStyle: TextStyle(color: tdGrey),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: tdGrey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: tdPurple),
-                  ),
-                ),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Username is required' : null,
+                decoration: _inputDecoration('Enter your Username'),
                 style: const TextStyle(color: tdWhite),
               ),
               const SizedBox(height: 26),
-              const Text('Password', style: TextStyle(color: tdWhite)),
+              _buildLabel('Password'),
               const SizedBox(height: 8),
               TextFormField(
                 controller: passwordController,
                 obscureText: _obs,
-                validator: (value) => value == null || value.length < 6
-                    ? 'Password must be at least 6 characters'
-                    : null,
-                decoration: InputDecoration(
-                  hintText: 'Password',
+                validator: (value) =>
+                    value == null || value.length < 6 ? 'Password must be at least 6 characters' : null,
+                decoration: _inputDecoration('Password').copyWith(
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obs ? Icons.visibility_off : Icons.visibility,
@@ -135,13 +123,6 @@ Future<void> _loadSavedLogin() async {
                         _obs = !_obs;
                       });
                     },
-                  ),
-                  hintStyle: const TextStyle(color: tdGrey),
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: tdGrey),
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: tdPurple),
                   ),
                 ),
                 style: const TextStyle(color: tdWhite),
@@ -188,34 +169,14 @@ Future<void> _loadSavedLogin() async {
                 ],
               ),
               const SizedBox(height: 40),
-              OutlinedButton.icon(
-                onPressed: () {},
-                icon: SvgPicture.asset('assets/icons/google.svg', width: 20),
-                label: const Text('Login with Google'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: tdWhite,
-                  side: const BorderSide(color: tdPurple),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  minimumSize: const Size.fromHeight(50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+              _socialButton(
+                iconPath: 'assets/icons/google.svg',
+                label: 'Login with Google',
               ),
               const SizedBox(height: 20),
-              OutlinedButton.icon(
-                onPressed: () {},
-                icon: SvgPicture.asset('assets/icons/apple.svg', width: 20),
-                label: const Text('Login with Apple'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: tdWhite,
-                  side: const BorderSide(color: tdPurple),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  minimumSize: const Size.fromHeight(50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+              _socialButton(
+                iconPath: 'assets/icons/apple.svg',
+                label: 'Login with Apple',
               ),
               const SizedBox(height: 46),
               Center(
@@ -247,6 +208,44 @@ Future<void> _loadSavedLogin() async {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLabel(String label) => Text(
+        label,
+        style: const TextStyle(
+          color: tdWhite,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          fontFamily: 'Lato',
+        ),
+      );
+
+  InputDecoration _inputDecoration(String hint) => InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: tdGrey),
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: tdGrey),
+        ),
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: tdPurple),
+        ),
+      );
+
+  Widget _socialButton({required String iconPath, required String label}) {
+    return OutlinedButton.icon(
+      onPressed: () {},
+      icon: SvgPicture.asset(iconPath, width: 20),
+      label: Text(label),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: tdWhite,
+        side: const BorderSide(color: tdPurple),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        minimumSize: const Size.fromHeight(50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
     );

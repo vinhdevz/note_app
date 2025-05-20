@@ -102,7 +102,7 @@ class MyApp extends StatelessWidget {
         '/onboarding': (context) => const OnboardingScreen(),
         '/welcome': (context) => const StartScreen(),
         '/login': (context) => const LoginScreen(),
-        '/home': (context) => const HomeScreen(),
+        '/home': (context) => const HomeScreen(username: '',),
   
         '/profile': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
