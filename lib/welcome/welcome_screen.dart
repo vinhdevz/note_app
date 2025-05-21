@@ -24,7 +24,7 @@ class StartScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 40), 
+            const SizedBox(height: 40),
             const Text(
               'Welcome to UpTodo',
               style: TextStyle(
@@ -46,13 +46,15 @@ class StartScreen extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            const Spacer(), 
+            const Spacer(),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()
-                  ),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
@@ -78,6 +80,10 @@ class StartScreen extends StatelessWidget {
               width: double.infinity,
               child: OutlinedButton(
                 onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  );
                 },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: tdDarkPurple, width: 2),

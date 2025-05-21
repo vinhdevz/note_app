@@ -46,7 +46,6 @@
   "Import from gallery": "Import from gallery",
   "Import from Google Drive":"Import from Google Drive",
   "Change full name":"Change full name",
-
   "Choose Category" : "Choose Category",
   "Create New": "Create New",
   "Add Category": "Add Category",
@@ -57,6 +56,15 @@
   "Category color" : "Category color",
   "Edit category" : "Edit category",
   "Create category": "Create category",
-  "Selected icon" : "Selected icon"
- 
+  "Selected icon" : "Selected icon",
+  "about_us": "About Us",
+  "faq": "Frequently Asked Questions",
+  "faq_q1": "How to create a new task?",
+  "faq_a1": "Tap the '+' button on the home screen to add a task.",
+  "faq_q2": "Can I use the app offline?",
+  "faq_a2": "No, you cannot use the app without internet.",
+  "faq1":"Question",
+  "faq2":"Answer",
+  "faq3":"UpTodo is a smart, simple and modern task management application.",
+  "faq4":"We help you organize your life more effectively using powerful tools like notes, reminders, and sync with Google Drive."
 }
