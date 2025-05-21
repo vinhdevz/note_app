@@ -3,6 +3,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
+import 'package:flutter_todo_app/home/about_us_screen.dart';
+import 'package:flutter_todo_app/home/faq_screen.dart';
 import 'package:flutter_todo_app/home/setting_screen.dart';
 import 'package:flutter_todo_app/database/task_database.dart';
 import 'package:image_picker/image_picker.dart';
@@ -43,11 +45,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      final fullnameFuture = UserDatabase.instance.getFullName(widget.username ?? '');
+      final fullnameFuture =
+          UserDatabase.instance.getFullName(widget.username ?? '');
       final statsFuture = TaskDatabase.instance.loadTaskStats();
-      final imagePathFuture = UserDatabase.instance.getProfileImage(widget.username ?? '');
+      final imagePathFuture =
+          UserDatabase.instance.getProfileImage(widget.username ?? '');
 
-      final results = await Future.wait([fullnameFuture, statsFuture, imagePathFuture]);
+      final results =
+          await Future.wait([fullnameFuture, statsFuture, imagePathFuture]);
 
       setState(() {
         _fullname = results[0] as String? ?? 'Guest';
@@ -55,7 +60,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _completedCount = stats['completed'] ?? 0;
         _uncompletedCount = stats['uncompleted'] ?? 0;
         final imagePath = results[2] as String?;
-        if (imagePath != null && imagePath.isNotEmpty && File(imagePath).existsSync()) {
+        if (imagePath != null &&
+            imagePath.isNotEmpty &&
+            File(imagePath).existsSync()) {
           _imagePath = imagePath;
         }
       });
@@ -79,7 +86,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _selectedImage = File(pickedImage.path);
         _imagePath = pickedImage.path;
       });
-      await UserDatabase.instance.updateProfileImage(widget.username ?? '', pickedImage.path);
+      await UserDatabase.instance
+          .updateProfileImage(widget.username ?? '', pickedImage.path);
       developer.log('Image saved to database for user: ${widget.username}');
     }
   }
@@ -117,7 +125,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 16),
               ListTile(
                 leading: const Icon(Icons.camera_alt, color: tdWhite),
-                title: Text('Take picture'.tr(), style: const TextStyle(color: tdWhite)),
+                title: Text('Take picture'.tr(),
+                    style: const TextStyle(color: tdWhite)),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(ImageSource.camera);
@@ -125,7 +134,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library, color: tdWhite),
-                title: Text('Import from gallery'.tr(), style: const TextStyle(color: tdWhite)),
+                title: Text('Import from gallery'.tr(),
+                    style: const TextStyle(color: tdWhite)),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(ImageSource.gallery);
@@ -133,17 +143,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.drive_folder_upload, color: tdWhite),
-                title: Text('Import from Google Drive'.tr(), style: const TextStyle(color: tdWhite)),
+                title: Text('Import from Google Drive'.tr(),
+                    style: const TextStyle(color: tdWhite)),
                 onTap: () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Google Drive integration not implemented')),
+                    const SnackBar(
+                        content:
+                            Text('Google Drive integration not implemented')),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.red),
-                title: Text('Remove profile image'.tr(), style: const TextStyle(color: Colors.red)),
+                title: Text('Remove profile image'.tr(),
+                    style: const TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
                   _removeProfileImage();
@@ -178,7 +192,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: tdPurple))
           : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 20.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 5, vertical: 20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -189,7 +204,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       backgroundColor: Colors.grey[300],
                       backgroundImage: _getProfileImage(),
                       child: _getProfileImage() == null
-                          ? const Icon(Icons.person, size: 50, color: Colors.grey)
+                          ? const Icon(Icons.person,
+                              size: 50, color: Colors.grey)
                           : null,
                     ),
                   ),
@@ -219,7 +235,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const SettingScreen()),
+                              MaterialPageRoute(
+                                  builder: (_) => const SettingScreen()),
                             );
                           },
                         ),
@@ -243,12 +260,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ProfileOption(
                           title: 'About Us'.tr(),
                           iconPath: 'assets/icons/menu.svg',
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const AboutUsScreen(),
+                              ),
+                            );
+                          },
                         ),
                         ProfileOption(
                           title: 'FAQ'.tr(),
                           iconPath: 'assets/icons/info_circle.svg',
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => FAQScreen()),
+                            );
+                          },
                         ),
                         ProfileOption(
                           title: 'Help & Feedback'.tr(),
@@ -261,10 +291,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onTap: () {},
                         ),
                         ListTile(
-                          leading: SvgPicture.asset('assets/icons/logout.svg', width: 24, height: 24),
+                          leading: SvgPicture.asset('assets/icons/logout.svg',
+                              width: 24, height: 24),
                           title: Text(
                             'Log out'.tr(),
-                            style: const TextStyle(color: Colors.red, fontSize: 16, fontFamily: 'Lato'),
+                            style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 16,
+                                fontFamily: 'Lato'),
                           ),
                           onTap: () => _showLogoutDialog(context),
                         ),
@@ -281,7 +315,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_selectedImage != null) {
       return FileImage(_selectedImage!);
     }
-    if (_imagePath != null && _imagePath!.isNotEmpty && File(_imagePath!).existsSync()) {
+    if (_imagePath != null &&
+        _imagePath!.isNotEmpty &&
+        File(_imagePath!).existsSync()) {
       return FileImage(File(_imagePath!));
     }
     return const AssetImage('assets/images/avatar.png');
@@ -309,9 +345,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               await UserDatabase.instance.clearLoginState();
               Navigator.of(context).pop();
               widget.onLogout();
-              Navigator.of(context).pushNamedAndRemoveUntil('/intro', (route) => false);
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/intro', (route) => false);
             },
-            child: Text('Clear & restart'.tr(), style: const TextStyle(color: Colors.red)),
+            child: Text('Clear & restart'.tr(),
+                style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -327,7 +365,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.grey[900],
         title: Text(
           'Change full name'.tr(),
-          style: const TextStyle(color: tdWhite, fontSize: 18, fontFamily: 'Lato'),
+          style:
+              const TextStyle(color: tdWhite, fontSize: 18, fontFamily: 'Lato'),
         ),
         content: TextField(
           controller: nameController,
@@ -346,13 +385,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
+            child: Text('Cancel'.tr(),
+                style: const TextStyle(color: tdWhite, fontSize: 16)),
           ),
           ElevatedButton(
             onPressed: () async {
               final newFullname = nameController.text.trim();
               if (newFullname.isNotEmpty && newFullname != _fullname) {
-                await UserDatabase.instance.updateFullName(widget.username ?? '', newFullname);
+                await UserDatabase.instance
+                    .updateFullName(widget.username ?? '', newFullname);
                 setState(() {
                   _fullname = newFullname;
                 });
@@ -361,9 +402,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6)),
             ),
-            child: Text('Edit'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
+            child: Text('Edit'.tr(),
+                style: const TextStyle(color: tdWhite, fontSize: 16)),
           ),
         ],
       ),
@@ -378,19 +421,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: Colors.grey[900],
-        title: Text('Change account Password'.tr(), style: const TextStyle(color: tdWhite, fontSize: 18)),
+        title: Text('Change account Password'.tr(),
+            style: const TextStyle(color: tdWhite, fontSize: 18)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildPasswordField(oldPasswordController, 'Enter old password'.tr()),
+            _buildPasswordField(
+                oldPasswordController, 'Enter old password'.tr()),
             const SizedBox(height: 12),
-            _buildPasswordField(newPasswordController, 'Enter new password'.tr()),
+            _buildPasswordField(
+                newPasswordController, 'Enter new password'.tr()),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
+            child: Text('Cancel'.tr(),
+                style: const TextStyle(color: tdWhite, fontSize: 16)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -411,7 +458,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               );
 
               if (success) {
-                await UserDatabase.instance.saveLoginState(widget.username ?? '');
+                await UserDatabase.instance
+                    .saveLoginState(widget.username ?? '');
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Password changed successfully'.tr())),
@@ -424,9 +472,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: tdDarkPurple,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6)),
             ),
-            child: Text('Edit'.tr(), style: const TextStyle(color: tdWhite, fontSize: 16)),
+            child: Text('Edit'.tr(),
+                style: const TextStyle(color: tdWhite, fontSize: 16)),
           ),
         ],
       ),
@@ -499,7 +549,8 @@ class StatBox extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: const TextStyle(color: tdWhite, fontSize: 14, fontFamily: 'Lato'),
+        style:
+            const TextStyle(color: tdWhite, fontSize: 14, fontFamily: 'Lato'),
       ),
     );
   }
@@ -523,7 +574,8 @@ class ProfileOption extends StatelessWidget {
       leading: SvgPicture.asset(iconPath, width: 24, height: 24),
       title: Text(
         title,
-        style: const TextStyle(color: tdWhite, fontSize: 16, fontFamily: 'Lato'),
+        style:
+            const TextStyle(color: tdWhite, fontSize: 16, fontFamily: 'Lato'),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, color: tdWhite, size: 16),
       onTap: onTap,

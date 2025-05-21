@@ -25,11 +25,14 @@ class TaskDatabase {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _createDB,
       onUpgrade: (db, oldVersion, newVersion) async {
-  if (oldVersion < 2) {
-    
+  // Tạo bảng categories nếu chưa tồn tại
+  final tables = await db.rawQuery(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='categories'"
+  );
+  if (tables.isEmpty) {
     await db.execute('''
       CREATE TABLE categories (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,18 +42,17 @@ class TaskDatabase {
       )
     ''');
   }
-  if (oldVersion < 3) {
-    // Thêm cột isCompleted nếu chưa có
-    final columns = await db.rawQuery("PRAGMA table_info(tasks)");
-    final hasIsCompleted = columns.any((col) => col['name'] == 'isCompleted');
 
-    if (!hasIsCompleted) {
-      await db.execute(
-        'ALTER TABLE tasks ADD COLUMN isCompleted INTEGER NOT NULL DEFAULT 0',
-      );
-    }
+  // Tạo cột isCompleted nếu chưa có
+  final columns = await db.rawQuery("PRAGMA table_info(tasks)");
+  final hasIsCompleted = columns.any((col) => col['name'] == 'isCompleted');
+  if (!hasIsCompleted) {
+    await db.execute(
+      'ALTER TABLE tasks ADD COLUMN isCompleted INTEGER NOT NULL DEFAULT 0',
+    );
   }
 }
+
 
     );
   }

@@ -57,6 +57,16 @@
   "Category color" : "Màu của danh mục",
   "Edit category" : "Sửa danh mục",
   "Create category": "Tạo danh mục",
-"Selected icon" : "Biểu tượng đã chọn"
+  "Selected icon" : "Biểu tượng đã chọn",
+  "about_us": "Về chúng tôi",
+  "faq": "Câu hỏi thường gặp",
+  "faq_q1": "Làm sao để tạo một công việc mới?",
+  "faq_a1": "Bạn có thể nhấn vào nút '+' trên màn hình chính để tạo công việc mới.",
+  "faq_q2": "Tôi có thể sử dụng ứng dụng offline không?",
+  "faq_a2": "Không, bạn không thể sử dụng ứng dụng mà không có internet.",
+  "faq1":"Câu hỏi",
+  "faq2":"Trả lời",
+  "faq3":"UpTodo là ứng dụng quản lý tác vụ thông minh, đơn giản và hiện đại.",
+  "faq4":"Chúng tôi giúp bạn tổ chức cuộc sống hiệu quả hơn bằng cách sử dụng các công cụ mạnh mẽ như ghi chú, nhắc nhở và đồng bộ với Google Drive."
 
 }
