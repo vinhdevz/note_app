@@ -247,7 +247,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         ProfileOption(
                           title: 'FAQ'.tr(),
-                          iconPath: 'assets/icons/info-circle.svg',
+                          iconPath: 'assets/icons/info_circle.svg',
                           onTap: () {},
                         ),
                         ProfileOption(

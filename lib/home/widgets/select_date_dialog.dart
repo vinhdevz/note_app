@@ -64,6 +64,7 @@ class _SelectDateDialogState extends State<SelectDateDialog> {
 
   TableCalendar<dynamic> tableCalendar() {
     return TableCalendar(
+      locale: "vi",
       focusedDay: selectedDate,
      firstDay: DateTime.now(),
       lastDay: DateTime.utc(2030, 12, 31),

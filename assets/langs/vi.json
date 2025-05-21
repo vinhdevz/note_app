@@ -46,6 +46,17 @@
   "Take picture": "Chụp ảnh",
   "Import from gallery": "Chọn từ thư viện",
   "Import from Google Drive":"Nhập từ Google Drive",
-  "Change full name":"Đổi tên tài khoản"
+  "Change full name":"Đổi tên tài khoản",
+  "Choose Category" : "Chọn danh mục",
+  "Create New": "Tạo mới",
+  "Add Category": "Thêm danh mục",
+  "Create new category": "Tạo danh mục mới",
+  "Category name" :"Tên danh mục",
+  "Category icon" :"Biểu tượng danh mục",
+  "Choose icon from library" : "Chọn biểu tượng từ thư viện",
+  "Category color" : "Màu của danh mục",
+  "Edit category" : "Sửa danh mục",
+  "Create category": "Tạo danh mục",
+"Selected icon" : "Biểu tượng đã chọn"
 
 }

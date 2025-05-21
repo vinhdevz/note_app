@@ -42,19 +42,25 @@ class SelectTimeDialog extends StatelessWidget {
       cancelText: 'Cancel'.tr(),          
       confirmText: 'Save'.tr(),            
       initialEntryMode: TimePickerEntryMode.input,
-      builder: (BuildContext context, Widget? child) {
-        if (child == null) return const SizedBox();
-        return Theme(
-          data: ThemeData.dark().copyWith(
-            timePickerTheme: _buildTimePickerTheme(),
-            colorScheme: const ColorScheme.dark(
-              primary: tdPurple,
-              onSurface: Colors.white,
-            ),
-          ),
-          child: _buildDialogContainer(child),
-        );
-      },
+      
+     builder: (BuildContext context, Widget? child) {
+  if (child == null) return const SizedBox();
+  return Localizations.override(
+    context: context,
+    locale: const Locale('en'), 
+    child: Theme(
+      data: ThemeData.dark().copyWith(
+        timePickerTheme: _buildTimePickerTheme(),
+        colorScheme: const ColorScheme.dark(
+          primary: tdPurple,
+          onSurface: Colors.white,
+        ),
+      ),
+      child: _buildDialogContainer(child),
+    ),
+  );
+},
+
     );
 
     if (time != null) {

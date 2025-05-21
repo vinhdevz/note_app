@@ -45,6 +45,18 @@
   "Take picture": "Take picture",
   "Import from gallery": "Import from gallery",
   "Import from Google Drive":"Import from Google Drive",
-  "Change full name":"Change full name"
+  "Change full name":"Change full name",
 
+  "Choose Category" : "Choose Category",
+  "Create New": "Create New",
+  "Add Category": "Add Category",
+  "Create new category": "Create new category",
+  "Category name" :"Category name",
+  "Category icon" :"Category icon",
+  "Choose icon from library" : "Choose icon from library",
+  "Category color" : "Category color",
+  "Edit category" : "Edit category",
+  "Create category": "Create category",
+  "Selected icon" : "Selected icon"
+ 
 }
