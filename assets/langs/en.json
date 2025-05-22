@@ -66,5 +66,15 @@
   "faq1":"Question",
   "faq2":"Answer",
   "faq3":"UpTodo is a smart, simple and modern task management application.",
-  "faq4":"We help you organize your life more effectively using powerful tools like notes, reminders, and sync with Google Drive."
+  "faq4":"We help you organize your life more effectively using powerful tools like notes, reminders, and sync with Google Drive.",
+  "help_feedback":"Help & Feedback",
+  "help_feedback_hint":"If you have any question or suggestions, let us know:",
+  "type_here":"Type your mesage here...",
+  "send":"Send",
+  "thank_you":"Thanks for your feedback!",
+  "support_us":"Support Us",
+  "support_us_desc":"You can support our development by rating, donating or sharing the app.",
+  "rate_us":"Rate Us",
+  "donate":"Donate",
+  "share_app":"Share App"
 }

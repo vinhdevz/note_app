@@ -63,7 +63,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   context,
                   MaterialPageRoute(builder: (_) => const LanguageSettingScreen()),
                 );
-                setState(() {}); // ⚠️ Rebuild lại sau khi chọn ngôn ngữ mới
+                setState(() {}); 
               },
             ),
             _buildSettingTitle('Import'.tr()),
