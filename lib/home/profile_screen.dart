@@ -5,8 +5,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
 import 'package:flutter_todo_app/home/about_us_screen.dart';
 import 'package:flutter_todo_app/home/faq_screen.dart';
+import 'package:flutter_todo_app/home/help_feed_back_screen.dart';
 import 'package:flutter_todo_app/home/setting_screen.dart';
 import 'package:flutter_todo_app/database/task_database.dart';
+import 'package:flutter_todo_app/home/support_us_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import '../database/user_db.dart';
 import 'dart:developer' as developer;
@@ -275,20 +277,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                  builder: (_) => FAQScreen()),
+                              MaterialPageRoute(builder: (_) => FAQScreen()),
                             );
                           },
                         ),
                         ProfileOption(
                           title: 'Help & Feedback'.tr(),
                           iconPath: 'assets/icons/flash.svg',
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const HelpFeedBackScreen(),
+                              ),
+                            );
+                          },
                         ),
                         ProfileOption(
                           title: 'Support Us'.tr(),
                           iconPath: 'assets/icons/like.svg',
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SupportUsScreen(),
+                              ),
+                            );
+                          },
                         ),
                         ListTile(
                           leading: SvgPicture.asset('assets/icons/logout.svg',

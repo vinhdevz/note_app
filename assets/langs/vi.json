@@ -67,6 +67,15 @@
   "faq1":"Câu hỏi",
   "faq2":"Trả lời",
   "faq3":"UpTodo là ứng dụng quản lý tác vụ thông minh, đơn giản và hiện đại.",
-  "faq4":"Chúng tôi giúp bạn tổ chức cuộc sống hiệu quả hơn bằng cách sử dụng các công cụ mạnh mẽ như ghi chú, nhắc nhở và đồng bộ với Google Drive."
-
+  "faq4":"Chúng tôi giúp bạn tổ chức cuộc sống hiệu quả hơn bằng cách sử dụng các công cụ mạnh mẽ như ghi chú, nhắc nhở và đồng bộ với Google Drive.",
+  "help_feedback":"Trợ giúp & Phản hồi",
+  "help_feedback_hint":"Nếu bạn có câu hỏi hoặc góp ý, hãy gửi cho chúng tôi:",
+  "type_here":"Nhập nội dung tại đây...",
+  "send":"Gửi",
+  "thank_you":"Cảm ơn bạn đã phản hồi!",
+  "support_us":"Ủng hộ chúng tôi",
+  "support_us_desc":"Bạn có thể ủng hộ bằng cách đánh giá, quyên góp hoặc chia sẻ ứng dụng.",
+  "rate_us":"Đánh giá",
+  "donate":"Ủng hộ",
+  "share_app":"Chia sẻ ứng dụng"
 }
