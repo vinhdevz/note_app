@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
 import 'package:flutter_todo_app/home/language_setting_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_todo_app/home/light_mode_screen.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -53,6 +54,17 @@ class _SettingScreenState extends State<SettingScreen> {
               'Change app typography'.tr(),
               'assets/icons/text.svg',
               onTap: () {},
+            ),_buildSettingOptions(
+              context,
+              'Change light mode'.tr(),
+              'assets/icons/sun-svgrepo-com.svg',
+               onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LightModeSettingScreen()),
+                );
+                setState(() {}); 
+              },
             ),
             _buildSettingOptions(
               context,
@@ -79,22 +91,32 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
-  Widget _buildSettingOptions(BuildContext context, String title, String icon, {VoidCallback? onTap}) {
-    return ListTile(
-      leading: SvgPicture.asset(icon, width: 24, height: 24),
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: tdWhite,
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-          fontFamily: 'Lato',
-        ),
+  Widget _buildSettingOptions(
+  BuildContext context,
+  String title,
+  String iconPath, {
+  VoidCallback? onTap,
+}) {
+  return ListTile(
+    leading: SvgPicture.asset(
+      iconPath,
+      width: 24,
+      height: 24,
+      colorFilter: const ColorFilter.mode(tdWhite, BlendMode.srcIn), 
+    ),
+    title: Text(
+      title,
+      style: const TextStyle(
+        color: tdWhite,
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        fontFamily: 'Lato',
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, color: tdWhite, size: 20),
-      onTap: onTap,
-    );
-  }
+    ),
+    trailing: const Icon(Icons.arrow_forward_ios, color: tdWhite, size: 20),
+    onTap: onTap,
+  );
+}
 
   Widget _buildSettingTitle(String title) {
     return Padding(

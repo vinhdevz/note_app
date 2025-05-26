@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
 import 'package:flutter_todo_app/home/widgets/add_task_screen.dart';
+import 'package:flutter_todo_app/home/widgets/task_detail_dialog.dart';
 import 'package:flutter_todo_app/models/category_model.dart';
 import 'package:flutter_todo_app/models/task_model.dart';
 import 'package:flutter_todo_app/database/task_database.dart';
@@ -36,30 +37,50 @@ class _TaskCardState extends State<TaskCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2E2E2E),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _buildCompletionCheckbox(),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTitleRow(),
-                const SizedBox(height: 2),
-                time(context),
-              ],
-            ),
-          ),
-        ],
+    return GestureDetector(
+  onTap: () {
+    showDialog(
+      context: context,
+      builder: (_) => TaskDetailDialog(
+        task: _task,
+        category: widget.category,
+        onDelete: widget.onDelete,
+        onEditSuccess: () async {
+          final updated = await TaskDatabase.instance.readTaskById(_task.id!);
+          if (updated != null) {
+            setState(() => _task = updated);
+          }
+          widget.onDelete?.call();
+        },
       ),
     );
+  },
+  child: Container(
+    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: const Color(0xFF2E2E2E),
+      borderRadius: BorderRadius.circular(5),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _buildCompletionCheckbox(),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTitleRow(),
+              const SizedBox(height: 2),
+              time(context),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ),
+);
+
   }
 
   Widget _buildCompletionCheckbox() {

@@ -3,7 +3,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo_app/constants/color.dart';
-import 'package:flutter_todo_app/home/widgets/create_category_screen.dart';
 import 'package:flutter_todo_app/models/task_model.dart';
 import 'package:flutter_todo_app/home/widgets/task_card.dart';
 import 'package:flutter_todo_app/database/task_database.dart';
