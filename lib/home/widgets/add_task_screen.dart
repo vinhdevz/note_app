@@ -61,7 +61,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     final title = _titleController.text.trim();
     if (title.isEmpty || _selectedDateTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('PleaseCompleteTitleAndTime'.tr())),
+        SnackBar(content: Text('Please Complete Title And Time'.tr())),
       );
       return;
     }

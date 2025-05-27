@@ -15,6 +15,7 @@ class LanguageSettingScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: tdBgColor,
       appBar: AppBar(
+         centerTitle: true,
         title: Text('Change app language'.tr()),
         backgroundColor: tdBgColor,
         foregroundColor: tdWhite,
