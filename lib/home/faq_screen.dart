@@ -17,24 +17,31 @@ class FAQScreen extends StatelessWidget {
       },
     ];
 
+    final theme = Theme.of(context);
+    final backgroundColor = theme.colorScheme.background;
+    final titleColor = theme.colorScheme.onBackground;
+    final answerColor = theme.colorScheme.onBackground.withOpacity(0.7);
+    final iconColor = theme.colorScheme.primary;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('faq'.tr()),
-        backgroundColor: Colors.black,
+        backgroundColor: backgroundColor,
+        foregroundColor: titleColor,
       ),
-      backgroundColor: Colors.black,
+      backgroundColor: backgroundColor,
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: faqList.length,
         itemBuilder: (context, index) {
           final faq = faqList[index];
           return ExpansionTile(
-            collapsedIconColor: Colors.white70,
-            iconColor: Colors.white,
+            collapsedIconColor: iconColor.withOpacity(0.7),
+            iconColor: iconColor,
             title: Text(
               faq['question']!,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: titleColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -43,7 +50,7 @@ class FAQScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   faq['answer']!,
-                  style: const TextStyle(color: Colors.white70),
+                  style: TextStyle(color: answerColor),
                 ),
               ),
             ],

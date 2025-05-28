@@ -85,7 +85,7 @@ Widget build(BuildContext context) {
               showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
-                backgroundColor: tdGrey,
+                backgroundColor:Theme.of(context).colorScheme.onPrimary,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                 ),

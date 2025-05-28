@@ -7,12 +7,21 @@ class SupportUsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final backgroundColor = theme.colorScheme.background;
+    final textColor = theme.colorScheme.onBackground.withOpacity(0.7);
+    final buttonTextColor = theme.colorScheme.onPrimary;
+    final rateButtonColor = theme.colorScheme.primary;
+    final donateButtonColor = Colors.pinkAccent; // bạn có thể thay đổi thành màu theme nếu muốn
+    final shareButtonColor = Colors.green;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('support_us'.tr()),
-        backgroundColor: Colors.black,
+        backgroundColor: backgroundColor,
+        foregroundColor: theme.colorScheme.onBackground,
       ),
-      backgroundColor: Colors.black,
+      backgroundColor: backgroundColor,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -20,7 +29,7 @@ class SupportUsScreen extends StatelessWidget {
           children: [
             Text(
               'support_us_desc'.tr(),
-              style: const TextStyle(color: Colors.white70, fontSize: 16),
+              style: TextStyle(color: textColor, fontSize: 16),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -29,7 +38,10 @@ class SupportUsScreen extends StatelessWidget {
               },
               icon: const Icon(Icons.star),
               label: Text('rate_us'.tr()),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: rateButtonColor,
+                foregroundColor: buttonTextColor,
+              ),
             ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
@@ -38,7 +50,10 @@ class SupportUsScreen extends StatelessWidget {
               },
               icon: const Icon(Icons.favorite),
               label: Text('donate'.tr()),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.pinkAccent),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: donateButtonColor,
+                foregroundColor: buttonTextColor,
+              ),
             ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
@@ -47,37 +62,40 @@ class SupportUsScreen extends StatelessWidget {
               },
               icon: const Icon(Icons.share),
               label: Text('share_app'.tr()),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: shareButtonColor,
+                foregroundColor: buttonTextColor,
+              ),
             ),
           ],
         ),
       ),
     );
   }
-  
+
   Future<void> _launchURL(BuildContext context, String url) async {
-  try {
-    final Uri uri = Uri.parse(url);
+    try {
+      final Uri uri = Uri.parse(url);
 
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication, 
-      );
-    } else {
-      _showError(context, 'Could not launch URL');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+      } else {
+        _showError(context, 'Could not launch URL');
+      }
+    } catch (e) {
+      _showError(context, 'Something went wrong');
     }
-  } catch (e) {
-    _showError(context, 'Something went wrong');
   }
-}
 
-void _showError(BuildContext context, String message) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(message),
-      backgroundColor: Colors.redAccent,
-    ),
-  );
-}
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.redAccent,
+      ),
+    );
+  }
 }

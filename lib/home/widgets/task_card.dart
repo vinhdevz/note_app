@@ -37,53 +37,56 @@ class _TaskCardState extends State<TaskCard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return GestureDetector(
-  onTap: () {
-    showDialog(
-      context: context,
-      builder: (_) => TaskDetailDialog(
-        task: _task,
-        category: widget.category,
-        onDelete: widget.onDelete,
-        onEditSuccess: () async {
-          final updated = await TaskDatabase.instance.readTaskById(_task.id!);
-          if (updated != null) {
-            setState(() => _task = updated);
-          }
-          widget.onDelete?.call();
-        },
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (_) => TaskDetailDialog(
+            task: _task,
+            category: widget.category,
+            onDelete: widget.onDelete,
+            onEditSuccess: () async {
+              final updated = await TaskDatabase.instance.readTaskById(_task.id!);
+              if (updated != null) {
+                setState(() => _task = updated);
+              }
+              widget.onDelete?.call();
+            },
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _buildCompletionCheckbox(colorScheme),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildTitleRow(textTheme, colorScheme),
+                  const SizedBox(height: 2),
+                  time(context, colorScheme),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
-  },
-  child: Container(
-    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: const Color(0xFF2E2E2E),
-      borderRadius: BorderRadius.circular(5),
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _buildCompletionCheckbox(),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTitleRow(),
-              const SizedBox(height: 2),
-              time(context),
-            ],
-          ),
-        ),
-      ],
-    ),
-  ),
-);
-
   }
 
-  Widget _buildCompletionCheckbox() {
+  Widget _buildCompletionCheckbox(ColorScheme colorScheme) {
     return Align(
       alignment: Alignment.center,
       child: GestureDetector(
@@ -110,11 +113,11 @@ class _TaskCardState extends State<TaskCard> {
     );
   }
 
-  Widget _buildTitleRow() {
+  Widget _buildTitleRow(TextTheme textTheme, ColorScheme colorScheme) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _buildTitleDescription()),
+        Expanded(child: _buildTitleDescription(textTheme, colorScheme)),
         const SizedBox(width: 16),
         if (widget.category != null) ...[
           categoryInTask(),
@@ -125,7 +128,7 @@ class _TaskCardState extends State<TaskCard> {
     );
   }
 
-  Widget _buildTitleDescription() {
+  Widget _buildTitleDescription(TextTheme textTheme, ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -134,24 +137,28 @@ class _TaskCardState extends State<TaskCard> {
             children: [
               TextSpan(
                 text: _task.title,
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
+                style: textTheme.titleMedium?.copyWith(
+                  color: _task.isCompleted
+                      ? colorScheme.onSurface.withOpacity(0.5)
+                      : colorScheme.onSurface,
                   decoration: _task.isCompleted
                       ? TextDecoration.lineThrough
                       : TextDecoration.none,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 18,
                 ),
               ),
               if (_task.description.isNotEmpty)
                 TextSpan(
                   text: ' - ${_task.description}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: _task.isCompleted
+                        ? colorScheme.onSurface.withOpacity(0.5)
+                        : colorScheme.onSurface.withOpacity(0.7),
                     decoration: _task.isCompleted
                         ? TextDecoration.lineThrough
                         : TextDecoration.none,
+                    fontSize: 14,
                   ),
                 ),
             ],
@@ -254,26 +261,32 @@ class _TaskCardState extends State<TaskCard> {
     );
   }
 
-  Widget time(BuildContext context) {
+  Widget time(BuildContext context, ColorScheme colorScheme) {
     return Row(
       children: [
         Text(
           '${_task.dateTime.toLocal()}'.split(' ')[0],
-          style: const TextStyle(color: Color(0xffAFAFAF), fontSize: 12),
+          style: TextStyle(
+            color: colorScheme.onSurfaceVariant,
+            fontSize: 12,
+          ),
         ),
         const SizedBox(width: 8),
         Text(
           '${_task.dateTime.hour.toString().padLeft(2, '0')}:${_task.dateTime.minute.toString().padLeft(2, '0')}',
-          style: const TextStyle(color: Color(0xffAFAFAF), fontSize: 12),
+          style: TextStyle(
+            color: colorScheme.onSurfaceVariant,
+            fontSize: 12,
+          ),
         ),
         const Spacer(),
         IconButton(
-          icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+          icon: Icon(Icons.edit, color: colorScheme.primary, size: 20),
           onPressed: () {
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
-              backgroundColor: tdGrey,
+              backgroundColor: colorScheme.surface,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
@@ -283,7 +296,7 @@ class _TaskCardState extends State<TaskCard> {
                   if (updated != null) {
                     setState(() => _task = updated);
                   }
-                  widget.onDelete?.call(); 
+                  widget.onDelete?.call();
                 },
                 existingTask: _task,
               ),

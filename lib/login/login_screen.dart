@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final savedData = await UserDatabase.instance.getSavedLogin();
     if (savedData != null) {
       usernameController.text = savedData['username'] ?? '';
-      passwordController.text = ''; 
+      passwordController.text = '';
       setState(() {
         rememberMe = true;
       });
@@ -47,7 +47,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!isValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid username or password')),
+        SnackBar(
+          content: Text('Invalid username or password'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
       );
       return;
     }
@@ -60,7 +63,10 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Login successful')),
+      SnackBar(
+        content: Text('Login successful'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      ),
     );
 
     Navigator.pushReplacement(
@@ -71,12 +77,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: tdBlack,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
-        backgroundColor: tdBlack,
+        backgroundColor: colorScheme.background,
         elevation: 0,
         leading: const BackButtonCustom(),
+        iconTheme: IconThemeData(color: colorScheme.onBackground),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -85,38 +95,38 @@ class _LoginScreenState extends State<LoginScreen> {
           child: ListView(
             children: [
               const SizedBox(height: 40),
-              const Text(
+              Text(
                 'Login',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Lato',
-                  color: tdWhite,
+                  color: colorScheme.onBackground,
                 ),
               ),
               const SizedBox(height: 52),
-              _buildLabel('Username'),
+              _buildLabel('Username', colorScheme),
               const SizedBox(height: 8),
               TextFormField(
                 controller: usernameController,
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Username is required' : null,
-                decoration: _inputDecoration('Enter your Username'),
-                style: const TextStyle(color: tdWhite),
+                decoration: _inputDecoration('Enter your Username', colorScheme),
+                style: TextStyle(color: colorScheme.onBackground),
               ),
               const SizedBox(height: 26),
-              _buildLabel('Password'),
+              _buildLabel('Password', colorScheme),
               const SizedBox(height: 8),
               TextFormField(
                 controller: passwordController,
                 obscureText: _obs,
                 validator: (value) =>
                     value == null || value.length < 6 ? 'Password must be at least 6 characters' : null,
-                decoration: _inputDecoration('Password').copyWith(
+                decoration: _inputDecoration('Password', colorScheme).copyWith(
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obs ? Icons.visibility_off : Icons.visibility,
-                      color: tdGrey,
+                      color: colorScheme.onBackground.withOpacity(0.6),
                     ),
                     onPressed: () {
                       setState(() {
@@ -125,12 +135,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                 ),
-                style: const TextStyle(color: tdWhite),
+                style: TextStyle(color: colorScheme.onBackground),
               ),
               CheckboxListTile(
-                title: const Text(
+                title: Text(
                   'Remember To Login',
-                  style: TextStyle(color: tdWhite),
+                  style: TextStyle(color: colorScheme.onBackground),
                 ),
                 value: rememberMe,
                 onChanged: (bool? value) {
@@ -140,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
                 controlAffinity: ListTileControlAffinity.leading,
                 contentPadding: EdgeInsets.zero,
-                activeColor: tdPurple,
+                activeColor: colorScheme.primary,
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -148,35 +158,37 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: ElevatedButton(
                   onPressed: _handleLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: tdPurple,
+                    backgroundColor: colorScheme.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text('Login', style: TextStyle(color: tdWhite)),
+                  child: Text('Login', style: TextStyle(color: colorScheme.onPrimary)),
                 ),
               ),
               const SizedBox(height: 32),
-              const Row(
+              Row(
                 children: [
-                  Expanded(child: Divider(color: tdGrey2)),
+                  Expanded(child: Divider(color: colorScheme.onBackground.withOpacity(0.3))),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text('or', style: TextStyle(color: tdGrey2)),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('or', style: TextStyle(color: colorScheme.onBackground.withOpacity(0.3))),
                   ),
-                  Expanded(child: Divider(color: tdGrey2)),
+                  Expanded(child: Divider(color: colorScheme.onBackground.withOpacity(0.3))),
                 ],
               ),
               const SizedBox(height: 40),
               _socialButton(
                 iconPath: 'assets/icons/google.svg',
                 label: 'Login with Google',
+                colorScheme: colorScheme,
               ),
               const SizedBox(height: 20),
               _socialButton(
                 iconPath: 'assets/icons/apple.svg',
                 label: 'Login with Apple',
+                colorScheme: colorScheme,
               ),
               const SizedBox(height: 46),
               Center(
@@ -187,16 +199,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       MaterialPageRoute(builder: (context) => const RegisterScreen()),
                     );
                   },
-                  child: const Text.rich(
+                  child: Text.rich(
                     TextSpan(
                       text: "Don't have an account? ",
-                      style: TextStyle(color: tdWhite),
+                      style: TextStyle(color: colorScheme.onBackground),
                       children: [
                         TextSpan(
                           text: 'Register',
                           style: TextStyle(
                             fontSize: 12,
-                            color: tdWhite,
+                            color: colorScheme.onBackground,
                             fontWeight: FontWeight.w400,
                             fontFamily: 'Lato',
                           ),
@@ -213,35 +225,39 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLabel(String label) => Text(
+  Widget _buildLabel(String label, ColorScheme colorScheme) => Text(
         label,
-        style: const TextStyle(
-          color: tdWhite,
+        style: TextStyle(
+          color: colorScheme.onBackground,
           fontSize: 16,
           fontWeight: FontWeight.w400,
           fontFamily: 'Lato',
         ),
       );
 
-  InputDecoration _inputDecoration(String hint) => InputDecoration(
+  InputDecoration _inputDecoration(String hint, ColorScheme colorScheme) => InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: tdGrey),
-        enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: tdGrey),
+        hintStyle: TextStyle(color: colorScheme.onBackground.withOpacity(0.6)),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: colorScheme.onBackground.withOpacity(0.3)),
         ),
-        focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: tdPurple),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: colorScheme.primary),
         ),
       );
 
-  Widget _socialButton({required String iconPath, required String label}) {
+  Widget _socialButton({
+    required String iconPath,
+    required String label,
+    required ColorScheme colorScheme,
+  }) {
     return OutlinedButton.icon(
       onPressed: () {},
       icon: SvgPicture.asset(iconPath, width: 20),
       label: Text(label),
       style: OutlinedButton.styleFrom(
-        foregroundColor: tdWhite,
-        side: const BorderSide(color: tdPurple),
+        foregroundColor: colorScheme.onBackground,
+        side: BorderSide(color: colorScheme.primary),
         padding: const EdgeInsets.symmetric(vertical: 14),
         minimumSize: const Size.fromHeight(50),
         shape: RoundedRectangleBorder(

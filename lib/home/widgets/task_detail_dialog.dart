@@ -26,7 +26,7 @@ class TaskDetailDialog extends StatelessWidget {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 20),
-      backgroundColor: tdGrey,
+      backgroundColor: Theme.of(context).dialogBackgroundColor,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -39,26 +39,28 @@ class TaskDetailDialog extends StatelessWidget {
   }
 
   List<Widget> showDescription(BuildContext context) {
+    final textColor = Theme.of(context).textTheme.bodyLarge!.color;
+
     return [
-      title(),
+      title(context),
       const SizedBox(height: 6),
-      const Divider(color: Colors.white24, thickness: 1),
+      Divider(color: textColor!.withOpacity(0.2), thickness: 1),
       const SizedBox(height: 12),
-      dateTime(),
+      dateTime(context),
       const SizedBox(height: 12),
       if (task.description.isNotEmpty)
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.grey.shade800,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
             task.description,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: tdText,
+              color: textColor,
             ),
           ),
         ),
@@ -76,7 +78,7 @@ class TaskDetailDialog extends StatelessWidget {
             final updated = await showModalBottomSheet<TaskModel>(
               context: context,
               isScrollControlled: true,
-              backgroundColor: tdGrey,
+              backgroundColor: Theme.of(context).dialogBackgroundColor,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
@@ -92,8 +94,8 @@ class TaskDetailDialog extends StatelessWidget {
               Navigator.pop(context);
             }
           },
-          icon: const Icon(Icons.edit, color: Colors.white, size: 20),
-          label: Text('Edit'.tr(), style: const TextStyle(color: Colors.white, fontSize: 18)),
+          icon: Icon(Icons.edit, color: Theme.of(context).iconTheme.color, size: 20),
+          label: Text('Edit'.tr(), style: TextStyle(color: Theme.of(context).iconTheme.color, fontSize: 18)),
         ),
         const SizedBox(width: 8),
         TextButton.icon(
@@ -109,35 +111,37 @@ class TaskDetailDialog extends StatelessWidget {
     );
   }
 
-  Widget dateTime() {
+  Widget dateTime(BuildContext context) {
+    final textColor = Theme.of(context).textTheme.bodyLarge!.color;
     return Row(
       children: [
-        const Icon(Icons.calendar_today, color: tdText, size: 20),
+        Icon(Icons.calendar_today, color: textColor, size: 20),
         const SizedBox(width: 8),
         Text(
           '${task.dateTime.toLocal()}'.split(' ')[0],
-          style: const TextStyle(color: tdText, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16),
         ),
         const SizedBox(width: 8),
         Text(
           '${task.dateTime.hour.toString().padLeft(2, '0')}:${task.dateTime.minute.toString().padLeft(2, '0')}',
-          style: const TextStyle(color: tdText, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16),
         ),
       ],
     );
   }
 
-  Widget title() {
+  Widget title(BuildContext context) {
+    final textColor = Theme.of(context).textTheme.titleLarge!.color;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Text(
             task.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: textColor,
             ),
           ),
         ),
@@ -180,7 +184,7 @@ class TaskDetailDialog extends StatelessWidget {
             : 'Hard'.tr();
 
     return Container(
-      width: 120, 
+      width: 120,
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       decoration: BoxDecoration(
         color: bgColor,
@@ -211,7 +215,7 @@ class TaskDetailDialog extends StatelessWidget {
   Widget _buildCategoryInfo() {
     final cat = category!;
     return Container(
-      width: 80, 
+      width: 80,
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       decoration: BoxDecoration(
         color: Color(cat.color),

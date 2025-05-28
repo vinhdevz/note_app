@@ -1,20 +1,23 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_todo_app/constants/color.dart';
 
 class AboutUsScreen extends StatelessWidget {
   const AboutUsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onBackground;
+    final backgroundColor = theme.colorScheme.background;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'about_us'.tr(),
-        ),
-        backgroundColor: tdBgColor,
+        title: Text('about_us'.tr()),
+        backgroundColor: backgroundColor,
+        foregroundColor: textColor,
+        elevation: 0,
       ),
-      backgroundColor: tdBgColor,
+      backgroundColor: backgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -22,16 +25,16 @@ class AboutUsScreen extends StatelessWidget {
           children: [
             Text(
               'faq3'.tr(),
-              style: const TextStyle(
-                color: tdWhite,
+              style: TextStyle(
+                color: textColor,
                 fontSize: 16,
               ),
             ),
             const SizedBox(height: 12),
             Text(
               'faq4'.tr(),
-              style: const TextStyle(
-                color: tdWhite,
+              style: TextStyle(
+                color: textColor,
                 fontSize: 16,
               ),
             ),

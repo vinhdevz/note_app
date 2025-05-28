@@ -28,9 +28,22 @@ class _SelectPriorityDialogState extends State<SelectPriorityDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    // Các màu lấy từ theme, fallback về màu bạn dùng
+    final bgDialog = theme.dialogBackgroundColor; // hoặc tdGrey fallback
+    final textColor = colorScheme.onSurface; // text chính dialog
+    final dividerColor = colorScheme.onSurface.withOpacity(0.3);
+    final btnCancelColor = colorScheme.primary; // tdPurple fallback
+    final btnSaveBgColor = colorScheme.primary;
+    final btnSaveTextColor = colorScheme.onPrimary;
+    final borderSelectedColor = Colors.black;
+    final borderUnselectedColor = btnCancelColor;
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-      backgroundColor: tdGrey,
+      backgroundColor: bgDialog,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
       child: Padding(
         padding: const EdgeInsets.all(13),
@@ -39,21 +52,45 @@ class _SelectPriorityDialogState extends State<SelectPriorityDialog> {
           children: [
             Text(
               'Task Priority'.tr(),
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: textColor,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const Divider(color: tdText),
+            Divider(color: dividerColor),
             const SizedBox(height: 10),
             Column(
               children: [
-                _buildPriorityOption(1, 'Easy'.tr(), iconEasy, priEasy),
+                _buildPriorityOption(
+                  1,
+                  'Easy'.tr(),
+                  iconEasy,
+                  priEasy,
+                  borderSelectedColor,
+                  borderUnselectedColor,
+                  textColor,
+                ),
                 const SizedBox(height: 10),
-                _buildPriorityOption(2, 'Normal'.tr(), iconNormal, priNormal),
+                _buildPriorityOption(
+                  2,
+                  'Normal'.tr(),
+                  iconNormal,
+                  priNormal,
+                  borderSelectedColor,
+                  borderUnselectedColor,
+                  textColor,
+                ),
                 const SizedBox(height: 10),
-                _buildPriorityOption(3, 'Hard'.tr(), iconHard, priHard),
+                _buildPriorityOption(
+                  3,
+                  'Hard'.tr(),
+                  iconHard,
+                  priHard,
+                  borderSelectedColor,
+                  borderUnselectedColor,
+                  textColor,
+                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -66,7 +103,7 @@ class _SelectPriorityDialogState extends State<SelectPriorityDialog> {
                       onPressed: () => Navigator.pop(context),
                       child: Text(
                         "Cancel".tr(),
-                        style: const TextStyle(color: tdPurple, fontSize: 16),
+                        style: TextStyle(color: btnCancelColor, fontSize: 16),
                       ),
                     ),
                   ),
@@ -81,14 +118,14 @@ class _SelectPriorityDialogState extends State<SelectPriorityDialog> {
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: tdPurple,
+                        backgroundColor: btnSaveBgColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
                       child: Text(
                         "Save".tr(),
-                        style: const TextStyle(color: tdText, fontSize: 16),
+                        style: TextStyle(color: btnSaveTextColor, fontSize: 16),
                       ),
                     ),
                   ),
@@ -101,7 +138,15 @@ class _SelectPriorityDialogState extends State<SelectPriorityDialog> {
     );
   }
 
-  Widget _buildPriorityOption(int value, String label, Color iconColor, Color bgColor) {
+  Widget _buildPriorityOption(
+    int value,
+    String label,
+    Color iconColor,
+    Color bgColor,
+    Color borderSelectedColor,
+    Color borderUnselectedColor,
+    Color textColor,
+  ) {
     final bool isSelected = _selected == value;
 
     return GestureDetector(
@@ -112,14 +157,15 @@ class _SelectPriorityDialogState extends State<SelectPriorityDialog> {
       },
       child: Container(
         height: 60,
-        decoration: BoxDecoration(
-          color: isSelected ? bgColor : tdGrey,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(
-            color: isSelected ? Colors.black : tdPurple,
-            width: 2,
-          ),
-        ),
+       decoration: BoxDecoration(
+  color: isSelected ? bgColor : Theme.of(context).colorScheme.onPrimary,
+  borderRadius: BorderRadius.circular(6),
+  border: Border.all(
+    color: isSelected ? borderSelectedColor : borderUnselectedColor,
+    width: 2,
+  ),
+),
+
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
@@ -135,8 +181,8 @@ class _SelectPriorityDialogState extends State<SelectPriorityDialog> {
             const SizedBox(width: 12),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: textColor,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),

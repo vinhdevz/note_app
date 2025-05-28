@@ -22,7 +22,7 @@ class UserDatabase {
 
     return await openDatabase(
       path,
-      version: 5, 
+      version: 6,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onDowngrade: _onDowngrade,
@@ -37,7 +37,8 @@ class UserDatabase {
         username TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL,
         fullname TEXT,
-        profileImage TEXT
+        profileImage TEXT,
+        isDarkMode INTEGER DEFAULT 0
       )
     ''');
 
@@ -53,6 +54,9 @@ class UserDatabase {
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
     developer.log('Upgrading database from version $oldVersion to $newVersion');
+    if (oldVersion < 6) {
+      await db.execute('ALTER TABLE users ADD COLUMN isDarkMode INTEGER DEFAULT 0');
+    }
     if (oldVersion < 5) {
       await db.execute('ALTER TABLE users ADD COLUMN profileImage TEXT');
       await db.execute('DROP TABLE IF EXISTS login_state');
@@ -96,12 +100,10 @@ class UserDatabase {
       final cleanFullName = fullName.trim();
 
       if (cleanUserName.isEmpty || cleanPassWord.isEmpty) {
-        developer.log('Error inserting user: Username or password is empty');
         return 'Username or password cannot be empty';
       }
 
       if (await checkUsernameExists(cleanUserName)) {
-        developer.log('Error inserting user: Username $cleanUserName already exists');
         return 'Username already exists';
       }
 
@@ -111,11 +113,11 @@ class UserDatabase {
           'username': cleanUserName,
           'password': _hashPassword(cleanPassWord),
           'fullname': cleanFullName,
-          'profileImage': '', 
+          'profileImage': '',
+          'isDarkMode': 0, // default to light mode
         },
         conflictAlgorithm: ConflictAlgorithm.fail,
       );
-      developer.log('User $cleanUserName inserted successfully');
       return 'success';
     } catch (e) {
       developer.log('Error inserting user: $e');
@@ -147,27 +149,16 @@ class UserDatabase {
         'login_state',
         {
           'username': userName.trim(),
-          'password': '', 
+          'password': '',
           'fullname': user.first['fullname'] as String? ?? '',
         },
       );
-    } else {
-      await db.insert(
-        'login_state',
-        {
-          'username': userName.trim(),
-          'password': '',
-          'fullname': '',
-        },
-      );
     }
-    developer.log('Login state saved with username only: $userName');
   }
 
   Future<void> clearLoginState() async {
     final db = await database;
     await db.delete('login_state');
-    developer.log('Login state cleared');
   }
 
   Future<Map<String, String>?> getSavedLogin() async {
@@ -207,10 +198,8 @@ class UserDatabase {
         where: 'username = ?',
         whereArgs: [userName.trim()],
       );
-      developer.log('Password updated for user: $userName');
       return true;
     }
-    developer.log('Failed to update password for user: $userName');
     return false;
   }
 
@@ -250,7 +239,6 @@ class UserDatabase {
       where: 'username = ?',
       whereArgs: [userName.trim()],
     );
-    developer.log('Profile image updated for user: $userName');
   }
 
   Future<void> updateFullName(String userName, String newFullName) async {
@@ -267,12 +255,37 @@ class UserDatabase {
       where: 'username = ?',
       whereArgs: [userName.trim()],
     );
-    developer.log('Fullname updated to $newFullName for user: $userName');
+  }
+
+  // 🔥 NEW: Get theme mode (dark = true, light = false)
+  Future<bool> getUserTheme(String userName) async {
+    final db = await database;
+    final result = await db.query(
+      'users',
+      columns: ['isDarkMode'],
+      where: 'username = ?',
+      whereArgs: [userName.trim()],
+    );
+    if (result.isNotEmpty) {
+      final value = result.first['isDarkMode'] as int;
+      return value == 1;
+    }
+    return false;
+  }
+
+  // 🔥 NEW: Update user theme mode
+  Future<void> updateUserTheme(String userName, bool isDark) async {
+    final db = await database;
+    await db.update(
+      'users',
+      {'isDarkMode': isDark ? 1 : 0},
+      where: 'username = ?',
+      whereArgs: [userName.trim()],
+    );
   }
 
   Future<void> close() async {
     final db = await database;
     db.close();
-    developer.log('Database closed');
   }
 }

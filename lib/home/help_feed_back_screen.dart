@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_todo_app/constants/color.dart';
 
 class HelpFeedBackScreen extends StatelessWidget {
   const HelpFeedBackScreen({super.key});
@@ -8,14 +7,21 @@ class HelpFeedBackScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController _controller = TextEditingController();
+    final theme = Theme.of(context);
+
+    final backgroundColor = theme.colorScheme.background;
+    final textColor = theme.colorScheme.onBackground;
+    final hintTextColor = textColor.withOpacity(0.7);
+    final fillColor = theme.colorScheme.surfaceVariant; 
+    final buttonColor = theme.colorScheme.error; 
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'help_feedback'.tr(),
-        ),
-        backgroundColor: tdBgColor,
+        title: Text('help_feedback'.tr()),
+        backgroundColor: backgroundColor,
+        foregroundColor: textColor,
       ),
-      backgroundColor: tdBgColor,
+      backgroundColor: backgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -23,8 +29,8 @@ class HelpFeedBackScreen extends StatelessWidget {
           children: [
             Text(
               'help_feedback_hint'.tr(),
-              style: const TextStyle(
-                color: tdWhite,
+              style: TextStyle(
+                color: textColor,
                 fontSize: 16,
               ),
             ),
@@ -32,37 +38,37 @@ class HelpFeedBackScreen extends StatelessWidget {
             TextField(
               controller: _controller,
               maxLines: 6,
-              style: const TextStyle(color: tdWhite),
+              style: TextStyle(color: textColor),
               decoration: InputDecoration(
                 hintText: 'type_here'.tr(),
-                hintStyle: const TextStyle(color: tdWhite),
+                hintStyle: TextStyle(color: hintTextColor),
                 filled: true,
-                fillColor: tdGrey,
+                fillColor: fillColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                final message = _controller.text;
-                if (message.isNotEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'thank_you'.tr(),
-                      ),
-                    ),
-                  );
-                  _controller.clear();
-                }
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: tdRed),
-              child: Text(
-                'send'.tr(),
-              ),
-            ),
+ElevatedButton(
+  onPressed: () {
+    final message = _controller.text;
+    if (message.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('thank_you'.tr()),
+        ),
+      );
+      _controller.clear();
+    }
+  },
+  style: ElevatedButton.styleFrom(backgroundColor: buttonColor),
+  child: Text(
+    'send'.tr(),
+    style: TextStyle(color: Colors.white),
+  ),
+),
+
           ],
         ),
       ),

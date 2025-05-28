@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_todo_app/constants/color.dart';
 import 'package:flutter_todo_app/database/user_db.dart';
 import 'package:flutter_todo_app/login/login_screen.dart';
 import 'dart:developer' as developer;
@@ -72,30 +71,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  TextStyle _labelStyle() => const TextStyle(
-        color: tdWhite,
+  TextStyle _labelStyle(Color color) => TextStyle(
+        color: color,
         fontSize: 16,
         fontWeight: FontWeight.w400,
         fontFamily: 'Lato',
       );
 
-  InputDecoration _inputDecoration(String hint) => InputDecoration(
+  InputDecoration _inputDecoration(String hint, Color hintColor, Color borderColor, Color focusedBorderColor) => InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: tdGrey2),
-        enabledBorder:
-            const OutlineInputBorder(borderSide: BorderSide(color: tdGrey2)),
-        focusedBorder:
-            const OutlineInputBorder(borderSide: BorderSide(color: tdPurple)),
+        hintStyle: TextStyle(color: hintColor),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: borderColor)),
+        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: focusedBorderColor)),
       );
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    // Ví dụ:
+    // colorScheme.onBackground: màu chữ chính
+    // colorScheme.onSurfaceVariant: màu chữ nhẹ
+    // colorScheme.primary: màu chính
+    // colorScheme.surface: nền
+    // colorScheme.background: nền tổng thể
+
     return Scaffold(
-      backgroundColor: tdBlack,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
-        backgroundColor: tdBlack,
+        backgroundColor: colorScheme.background,
         elevation: 0,
         leading: const BackButtonCustom(),
+        iconTheme: IconThemeData(color: colorScheme.onBackground),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -104,10 +111,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: ListView(
             children: [
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Register',
                 style: TextStyle(
-                  color: tdWhite,
+                  color: colorScheme.onBackground,
                   fontSize: 32,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Lato',
@@ -115,39 +122,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
 
               const SizedBox(height: 24),
-              Text('Full name', style: _labelStyle()),
+              Text('Full name', style: _labelStyle(colorScheme.onBackground)),
               const SizedBox(height: 8),
               TextFormField(
                 controller: fullnameController,
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Full name is required'
-                    : null,
-                decoration: _inputDecoration('Enter your full name'),
-                style: const TextStyle(color: tdWhite),
+                validator: (value) => value == null || value.isEmpty ? 'Full name is required' : null,
+                decoration: _inputDecoration(
+                  'Enter your full name',
+                  colorScheme.onSurfaceVariant,
+                  colorScheme.onSurfaceVariant,
+                  colorScheme.primary,
+                ),
+                style: TextStyle(color: colorScheme.onBackground),
               ),
 
               const SizedBox(height: 26),
-              Text('Username', style: _labelStyle()),
+              Text('Username', style: _labelStyle(colorScheme.onBackground)),
               const SizedBox(height: 8),
               TextFormField(
                 controller: usernameController,
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Username is required'
-                    : null,
-                decoration: _inputDecoration('Enter your username'),
-                style: const TextStyle(color: tdWhite),
+                validator: (value) => value == null || value.isEmpty ? 'Username is required' : null,
+                decoration: _inputDecoration(
+                  'Enter your username',
+                  colorScheme.onSurfaceVariant,
+                  colorScheme.onSurfaceVariant,
+                  colorScheme.primary,
+                ),
+                style: TextStyle(color: colorScheme.onBackground),
               ),
 
               const SizedBox(height: 26),
-              Text('Password', style: _labelStyle()),
+              Text('Password', style: _labelStyle(colorScheme.onBackground)),
               const SizedBox(height: 8),
               TextFormField(
                 controller: passwordController,
                 obscureText: _obsPass,
-                validator: (value) => value == null || value.length < 6
-                    ? 'Password must be at least 6 characters'
-                    : null,
-                decoration: _inputDecoration('Password').copyWith(
+                validator: (value) => value == null || value.length < 6 ? 'Password must be at least 6 characters' : null,
+                decoration: _inputDecoration(
+                  'Password',
+                  colorScheme.onSurfaceVariant,
+                  colorScheme.onSurfaceVariant,
+                  colorScheme.primary,
+                ).copyWith(
                   suffixIcon: IconButton(
                     onPressed: () {
                       setState(() {
@@ -156,15 +172,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     icon: Icon(
                       _obsPass ? Icons.visibility_off : Icons.visibility,
-                      color: tdGrey,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
-                style: const TextStyle(color: tdWhite),
+                style: TextStyle(color: colorScheme.onBackground),
               ),
 
               const SizedBox(height: 26),
-              Text('Confirm Password', style: _labelStyle()),
+              Text('Confirm Password', style: _labelStyle(colorScheme.onBackground)),
               const SizedBox(height: 8),
               TextFormField(
                 controller: confirmPasswordController,
@@ -178,7 +194,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   }
                   return null;
                 },
-                decoration: _inputDecoration('Re-enter your password').copyWith(
+                decoration: _inputDecoration(
+                  'Re-enter your password',
+                  colorScheme.onSurfaceVariant,
+                  colorScheme.onSurfaceVariant,
+                  colorScheme.primary,
+                ).copyWith(
                   suffixIcon: IconButton(
                     onPressed: () {
                       setState(() {
@@ -187,35 +208,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     icon: Icon(
                       _obsConfirm ? Icons.visibility_off : Icons.visibility,
-                      color: tdGrey,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
-                style: const TextStyle(color: tdWhite),
+                style: TextStyle(color: colorScheme.onBackground),
               ),
 
               const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: _handleRegister,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: tdPurple,
+                  backgroundColor: colorScheme.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text('Register', style: TextStyle(color: tdWhite)),
+                child: Text('Register', style: TextStyle(color: colorScheme.onPrimary)),
               ),
 
               const SizedBox(height: 32),
-              const Row(
+              Row(
                 children: [
-                  Expanded(child: Divider(color: tdGrey2)),
+                  Expanded(child: Divider(color: colorScheme.onSurfaceVariant)),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text('or', style: TextStyle(color: tdGrey2)),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('or', style: TextStyle(color: colorScheme.onSurfaceVariant)),
                   ),
-                  Expanded(child: Divider(color: tdGrey2)),
+                  Expanded(child: Divider(color: colorScheme.onSurfaceVariant)),
                 ],
               ),
 
@@ -223,10 +244,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: SvgPicture.asset('assets/icons/google.svg', width: 20),
-                label: const Text('Register with Google'),
+                label: Text('Register with Google', style: TextStyle(color: colorScheme.onBackground)),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: tdWhite,
-                  side: const BorderSide(color: tdPurple),
+                  foregroundColor: colorScheme.onBackground,
+                  side: BorderSide(color: colorScheme.primary),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   minimumSize: const Size.fromHeight(50),
                   shape: RoundedRectangleBorder(
@@ -239,10 +260,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: SvgPicture.asset('assets/icons/apple.svg', width: 20),
-                label: const Text('Register with Apple'),
+                label: Text('Register with Apple', style: TextStyle(color: colorScheme.onBackground)),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: tdWhite,
-                  side: const BorderSide(color: tdPurple),
+                  foregroundColor: colorScheme.onBackground,
+                  side: BorderSide(color: colorScheme.primary),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   minimumSize: const Size.fromHeight(50),
                   shape: RoundedRectangleBorder(
@@ -257,20 +278,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginScreen()),
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
                     );
                   },
-                  child: const Text.rich(
+                  child: Text.rich(
                     TextSpan(
                       text: "Already have an account?  ",
-                      style: TextStyle(color: tdWhite),
+                      style: TextStyle(color: colorScheme.onBackground),
                       children: [
                         TextSpan(
                           text: 'Login',
                           style: TextStyle(
                             fontSize: 12,
-                            color: tdWhite,
+                            color: colorScheme.onBackground,
                             fontWeight: FontWeight.w400,
                             fontFamily: 'Lato',
                           ),
