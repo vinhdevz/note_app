@@ -2,19 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/constants/color.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-class SelectTimeDialog extends StatelessWidget {
+class SelectTimeDialog extends StatefulWidget {
   final void Function(TimeOfDay time) onTimeSelected;
 
   const SelectTimeDialog({super.key, required this.onTimeSelected});
 
   @override
-  Widget build(BuildContext context) {
+  State<SelectTimeDialog> createState() => _SelectTimeDialogState();
+}
+
+class _SelectTimeDialogState extends State<SelectTimeDialog> {
+  @override
+  void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showTimePicker(context);
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: tdGrey,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(3),
       ),
@@ -26,7 +35,7 @@ class SelectTimeDialog extends StatelessWidget {
           child: Center(
             child: Text(
               'Please choose a time',
-              style: TextStyle(color: Colors.white, fontSize: 18),
+              style: TextStyle(fontSize: 18),
             ),
           ),
         ),
@@ -38,42 +47,38 @@ class SelectTimeDialog extends StatelessWidget {
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
-      helpText: 'Choose Time'.tr(),      
-      cancelText: 'Cancel'.tr(),          
-      confirmText: 'Save'.tr(),            
+      helpText: 'Choose Time'.tr(),
+      cancelText: 'Cancel'.tr(),
+      confirmText: 'Save'.tr(),
       initialEntryMode: TimePickerEntryMode.input,
-      
-     builder: (BuildContext context, Widget? child) {
-  if (child == null) return const SizedBox();
-  return Localizations.override(
-    context: context,
-    locale: const Locale('en'), 
-    child: Theme(
-      data: ThemeData.dark().copyWith(
-        timePickerTheme: _buildTimePickerTheme(),
-        colorScheme: const ColorScheme.dark(
-          primary: tdPurple,
-          onSurface: Colors.white,
-        ),
-      ),
-      child: _buildDialogContainer(child),
-    ),
-  );
-},
-
+      builder: (BuildContext context, Widget? child) {
+        if (child == null) return const SizedBox();
+        return Localizations.override(
+          context: context,
+          locale: const Locale('en'),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              timePickerTheme: _buildTimePickerTheme(context),
+              colorScheme: Theme.of(context).colorScheme.copyWith(
+                    primary: tdPurple,
+                    onSurface: Theme.of(context).colorScheme.onSurface,
+                  ),
+            ),
+            child: _buildDialogContainer(child),
+          ),
+        );
+      },
     );
 
     if (time != null) {
-      onTimeSelected(time);
-      Navigator.of(context).pop();
-    } else {
-      Navigator.of(context).pop(); 
+      widget.onTimeSelected(time);
     }
+    Navigator.of(context).pop();
   }
 
   Dialog _buildDialogContainer(Widget child) {
     return Dialog(
-      backgroundColor: tdGrey,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(3),
       ),
@@ -88,33 +93,35 @@ class SelectTimeDialog extends StatelessWidget {
     );
   }
 
-  TimePickerThemeData _buildTimePickerTheme() {
+  TimePickerThemeData _buildTimePickerTheme(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return TimePickerThemeData(
-      backgroundColor: tdGrey,
-      hourMinuteTextColor: Colors.white,
+      backgroundColor: colorScheme.surface,
+      hourMinuteTextColor: colorScheme.onSurface,
       hourMinuteShape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(4)),
       ),
-      hourMinuteTextStyle: const TextStyle(
-        color: Colors.white,
+      hourMinuteTextStyle: TextStyle(
+        color: colorScheme.onSurface,
         fontSize: 24,
         fontWeight: FontWeight.bold,
         height: 2.5,
       ),
-      dayPeriodTextColor: Colors.white,
+      dayPeriodTextColor: colorScheme.onSurface,
       dayPeriodShape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(4)),
       ),
       dayPeriodColor: MaterialStateColor.resolveWith((states) {
         return states.contains(MaterialState.selected)
             ? tdPurple
-            : const Color(0xFF1E1E1E);
+            : colorScheme.surfaceVariant;
       }),
       dialHandColor: tdPurple,
-      dialBackgroundColor: const Color(0xFF1E1E1E),
+      dialBackgroundColor: colorScheme.background,
       entryModeIconColor: tdPurple,
-      helpTextStyle: const TextStyle(
-        color: Colors.white,
+      helpTextStyle: TextStyle(
+        color: colorScheme.onSurface,
         fontSize: 18,
       ),
       cancelButtonStyle: TextButton.styleFrom(

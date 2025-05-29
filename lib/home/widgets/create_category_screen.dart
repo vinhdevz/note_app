@@ -78,7 +78,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
   void _chooseIconFromLibrary() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: tdGrey,
+      backgroundColor: Theme.of(context).colorScheme.background, 
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -105,15 +105,20 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isSelected ? tdPurple : tdBlack,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.surfaceVariant,
           borderRadius: BorderRadius.circular(10),
           border: isSelected
-              ? Border.all(color: tdPurple, width: 2)
+              ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2)
               : Border.all(color: Colors.transparent),
         ),
         child: SvgPicture.asset(
           path,
-          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          colorFilter: ColorFilter.mode(
+            Theme.of(context).colorScheme.onSurface,
+            BlendMode.srcIn,
+          ),
         ),
       ),
     );
@@ -165,21 +170,24 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Category name'.tr(), // 'Category name :'
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+          'Category name'.tr(),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onBackground,
+            fontSize: 16,
+          ),
         ),
         const SizedBox(height: 8),
         TextField(
           controller: _nameController,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
           decoration: InputDecoration(
-            hintText: 'Category name'.tr(), // 'Category name'
-            hintStyle: const TextStyle(color: Colors.white54),
+            hintText: 'Category name'.tr(),
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
             filled: true,
-            fillColor: Colors.black,
+            fillColor: Theme.of(context).colorScheme.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.white24),
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
             ),
           ),
         ),
@@ -192,31 +200,41 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Category icon'.tr(), // 'Category icon :'
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+          'Category icon'.tr(),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onBackground,
+            fontSize: 16,
+          ),
         ),
         const SizedBox(height: 8),
         ElevatedButton(
           onPressed: _chooseIconFromLibrary,
           style: ElevatedButton.styleFrom(
-            backgroundColor: tdGrey,
+            backgroundColor: Theme.of(context).colorScheme.background,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          child: Text('Choose icon from library'.tr()), // 'Choose icon from library'
+          child: Text(
+            'Choose icon from library'.tr(),
+            style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+          ),
         ),
         const SizedBox(height: 12),
         if (_iconPath != null)
           Row(
             children: [
-              Text('Selected icon'.tr(), style: const TextStyle(color: Colors.white70)), // 'Selected icon:'
+              Text('Selected icon'.tr(),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7))),
               const SizedBox(width: 8),
               SvgPicture.asset(
                 _iconPath!,
                 width: 28,
                 height: 28,
-                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                  Theme.of(context).colorScheme.onBackground,
+                  BlendMode.srcIn,
+                ),
               ),
             ],
           ),
@@ -229,8 +247,11 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Category color'.tr(), // 'Category color :'
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+          'Category color'.tr(),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onBackground,
+            fontSize: 16,
+          ),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -251,7 +272,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
-          border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
+          border: isSelected ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2) : null,
         ),
       ),
     );
@@ -261,18 +282,22 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(
-            'Cancel'.tr(),
-            style: const TextStyle(color: tdPurple, fontSize: 16),
-          ),
-        ),
-        
+       Expanded(
+  child: TextButton(
+    onPressed: () => Navigator.pop(context),
+    child: Text(
+      'Cancel'.tr(),
+      textAlign: TextAlign.center,
+      style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16),
+    ),
+  ),
+),
+
+
         ElevatedButton(
           onPressed: _saveCategory,
           style: ElevatedButton.styleFrom(
-            backgroundColor: tdPurple,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -281,7 +306,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
             child: Text(
               isEditMode ? 'Save'.tr() : 'Create category'.tr(),
-              style: const TextStyle(color: tdText, fontSize: 16),
+              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 16),
             ),
           ),
         ),
@@ -294,16 +319,16 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
     final isEditMode = widget.category != null;
 
     return Scaffold(
-      backgroundColor: tdBlack,
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        backgroundColor: tdBlack,
+        backgroundColor: Theme.of(context).colorScheme.background,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onBackground),
         centerTitle: true,
         title: Text(
           isEditMode ? 'Edit category'.tr() : 'Create new category'.tr(),
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),

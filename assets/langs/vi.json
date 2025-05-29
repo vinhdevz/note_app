@@ -78,5 +78,9 @@
   "rate_us":"Đánh giá",
   "donate":"Ủng hộ",
   "share_app":"Chia sẻ ứng dụng",
-  "Delete" : "Xoá"
+  "Delete" : "Xoá",
+  "Change light mode":"Chuyển chế độ sáng",
+  "Light mode" : "Chế độ sáng",
+  "Turn on" : "Bật",
+  "Turn off": "Tắt"
 }

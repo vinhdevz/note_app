@@ -42,20 +42,23 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     }
   }
 
-  InputDecoration _inputDecoration(String hint) => InputDecoration(
-        hintText: hint.tr(),
-        hintStyle: const TextStyle(color: Colors.white70),
-        filled: true,
-        fillColor: tdGrey,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.white),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.white, width: 1.5),
-        ),
-      );
+  InputDecoration _inputDecoration(BuildContext context, String hint) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return InputDecoration(
+      hintText: hint.tr(),
+      hintStyle: TextStyle(color: colorScheme.onSurface),
+      filled: true,
+      fillColor: colorScheme.surface,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colorScheme.onSurface),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
+      ),
+    );
+  }
 
   Future<void> _submitTask() async {
     final title = _titleController.text.trim();
@@ -124,16 +127,25 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     }
   }
 
-  Widget _iconButton(String iconPath, String action) => GestureDetector(
-        onTap: () => _handleIconTap(action),
-        child: Padding(
-          padding: const EdgeInsets.only(right: 26),
-          child: SvgPicture.asset(iconPath, width: 24, height: 24),
+  Widget _iconButton(BuildContext context, String iconPath, String action) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: () => _handleIconTap(action),
+      child: Padding(
+        padding: const EdgeInsets.only(right: 26),
+        child: SvgPicture.asset(
+          iconPath,
+          width: 24,
+          height: 24,
+          color: colorScheme.onSurface,  // màu icon theo theme
         ),
-      );
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -148,8 +160,8 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
             alignment: Alignment.centerLeft,
             child: Text(
               widget.existingTask == null ? 'Add Task'.tr() : 'Edit Task'.tr(),
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: colorScheme.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -158,29 +170,34 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
           const SizedBox(height: 16),
           TextField(
             controller: _titleController,
-            decoration: _inputDecoration('Enter task title'),
-            cursorColor: Colors.white,
-            style: const TextStyle(color: Colors.white),
+            decoration: _inputDecoration(context, 'Enter task title'),
+            cursorColor: colorScheme.primary,
+            style: TextStyle(color: colorScheme.onSurface),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _descController,
-            decoration: _inputDecoration('Description'),
-            cursorColor: Colors.white,
-            style: const TextStyle(color: Colors.white),
+            decoration: _inputDecoration(context, 'Description'),
+            cursorColor: colorScheme.primary,
+            style: TextStyle(color: colorScheme.onSurface),
           ),
           const SizedBox(height: 20),
           Row(
             children: [
-              _iconButton('assets/icons/timer.svg', 'date'),
-              _iconButton('assets/icons/tag.svg', 'tag'),
-              _iconButton('assets/icons/flag.svg', 'priority'),
+              _iconButton(context, 'assets/icons/timer.svg', 'date'),
+              _iconButton(context, 'assets/icons/tag.svg', 'tag'),
+              _iconButton(context, 'assets/icons/flag.svg', 'priority'),
               const Spacer(),
               GestureDetector(
                 onTap: _submitTask,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20),
-                  child: SvgPicture.asset('assets/icons/send.svg', width: 24, height: 24),
+                  child: SvgPicture.asset(
+                    'assets/icons/send.svg',
+                    width: 24,
+                    height: 24,
+                    color: colorScheme.primary,
+                  ),
                 ),
               ),
             ],

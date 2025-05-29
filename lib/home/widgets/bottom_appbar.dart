@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_todo_app/constants/color.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class BottomAppbar extends StatelessWidget {
@@ -15,10 +14,11 @@ class BottomAppbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
       notchMargin: 8.0,
-      color: tdGrey,
+      color: Theme.of(context).colorScheme.tertiary,
       height: 85,
       child: SafeArea(
         child: Row(
@@ -26,14 +26,14 @@ class BottomAppbar extends StatelessWidget {
           children: <Widget>[
             Row(
               children: [
-                _buildTabItem('assets/icons/home_index.svg', 'Index', 0),
-                _buildTabItem('assets/icons/calendar.svg', 'Calendar', 1),
+                _buildTabItem(context, 'assets/icons/home_index.svg', 'Index', 0),
+                _buildTabItem(context, 'assets/icons/calendar.svg', 'Calendar', 1),
               ],
             ),
             Row(
               children: [
-                _buildTabItem('assets/icons/clock.svg', 'Focus', 2),
-                _buildTabItem('assets/icons/user.svg', 'Profile', 3),
+                _buildTabItem(context, 'assets/icons/clock.svg', 'Focus', 2),
+                _buildTabItem(context, 'assets/icons/user.svg', 'Profile', 3),
               ],
             ),
           ],
@@ -42,8 +42,12 @@ class BottomAppbar extends StatelessWidget {
     );
   }
 
-  Widget _buildTabItem(String iconPath, String label, int index) {
+  Widget _buildTabItem(BuildContext context, String iconPath, String label, int index) {
     final isSelected = currentIndex == index;
+    final colorScheme = Theme.of(context).colorScheme;
+    final iconColor = isSelected ? colorScheme.secondary : colorScheme.onSurface;
+    final textColor = isSelected ? colorScheme.secondary : colorScheme.onSurface;
+
     return InkWell(
       onTap: () => onTabSelected(index),
       child: Padding(
@@ -55,13 +59,13 @@ class BottomAppbar extends StatelessWidget {
               iconPath,
               width: 24,
               height: 24,
-              color: isSelected ? tdPurple : Colors.white,
+              color: iconColor,
             ),
             const SizedBox(height: 4),
             Text(
               label.tr(),
               style: TextStyle(
-                color: isSelected ? tdPurple : Colors.white,
+                color: textColor,
                 fontSize: 12,
               ),
             ),

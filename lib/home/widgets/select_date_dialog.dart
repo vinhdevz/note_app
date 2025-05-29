@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:flutter_todo_app/constants/color.dart';
 import 'package:flutter_todo_app/home/widgets/select_time_dialog.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -38,71 +37,73 @@ class _SelectDateDialogState extends State<SelectDateDialog> {
         time.hour,
         time.minute,
       );
-      widget.onDateTimeSelected(selectedDateTime);  
+      widget.onDateTimeSelected(selectedDateTime);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
-      backgroundColor: tdGrey,
+      backgroundColor: colorScheme.surface,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20),
       child: Padding(
         padding: const EdgeInsets.all(13),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            tableCalendar(),
+            tableCalendar(context, colorScheme),
             const SizedBox(height: 20),
-            buttonCalendar(context),
+            buttonCalendar(context, colorScheme),
           ],
         ),
       ),
     );
   }
 
-  TableCalendar<dynamic> tableCalendar() {
+  TableCalendar<dynamic> tableCalendar(BuildContext context, ColorScheme colorScheme) {
     return TableCalendar(
       locale: "vi",
       focusedDay: selectedDate,
-     firstDay: DateTime.now(),
+      firstDay: DateTime.now(),
       lastDay: DateTime.utc(2030, 12, 31),
       selectedDayPredicate: (day) => isSameDay(day, selectedDate),
       onDaySelected: _onDaySelected,
       calendarBuilders: CalendarBuilders(
-        defaultBuilder: (context, day, _) => _buildDayCell(day, isSelected: false, isToday: false),
-        selectedBuilder: (context, day, _) => _buildDayCell(day, isSelected: true, isToday: false),
-        todayBuilder: (context, day, _) => _buildDayCell(day, isSelected: false, isToday: true),
-        outsideBuilder: (context, day, _) => _buildDayCell(day, isSelected: false, isToday: false, isOutside: true),
+        defaultBuilder: (context, day, _) => _buildDayCell(day, colorScheme, isSelected: false, isToday: false),
+        selectedBuilder: (context, day, _) => _buildDayCell(day, colorScheme, isSelected: true, isToday: false),
+        todayBuilder: (context, day, _) => _buildDayCell(day, colorScheme, isSelected: false, isToday: true),
+        outsideBuilder: (context, day, _) => _buildDayCell(day, colorScheme, isSelected: false, isToday: false, isOutside: true),
       ),
       calendarStyle: const CalendarStyle(isTodayHighlighted: true),
       headerStyle: HeaderStyle(
         formatButtonVisible: false,
         titleCentered: true,
         titleTextFormatter: (date, _) => '${_monthName(date.month).toUpperCase()}\n${date.year}',
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 16, height: 1.4),
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.white30, width: 1)),
+        titleTextStyle: TextStyle(color: colorScheme.onSurface, fontSize: 16, height: 1.4),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: colorScheme.outline)),
         ),
-        leftChevronIcon: const Icon(Icons.chevron_left, color: Colors.white),
-        rightChevronIcon: const Icon(Icons.chevron_right, color: Colors.white),
+        leftChevronIcon: Icon(Icons.chevron_left, color: colorScheme.onSurface),
+        rightChevronIcon: Icon(Icons.chevron_right, color: colorScheme.onSurface),
       ),
       daysOfWeekHeight: 30,
-      daysOfWeekStyle: const DaysOfWeekStyle(
-        weekdayStyle: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-        weekendStyle: TextStyle(color: Color(0xffFF4949), fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+      daysOfWeekStyle: DaysOfWeekStyle(
+        weekdayStyle: TextStyle(color: colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+        weekendStyle: TextStyle(color: colorScheme.error, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2),
       ),
     );
   }
 
-  Widget buttonCalendar(BuildContext context) {
+  Widget buttonCalendar(BuildContext context, ColorScheme colorScheme) {
     return Row(
       children: [
         Expanded(
           child: TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Cancel".tr(), style: const TextStyle(color: tdPurple, fontSize: 16)),
+            child: Text("Cancel".tr(), style: TextStyle(color: colorScheme.primary, fontSize: 16)),
           ),
         ),
         const SizedBox(width: 10),
@@ -110,11 +111,11 @@ class _SelectDateDialogState extends State<SelectDateDialog> {
           child: ElevatedButton(
             onPressed: _chooseTime,
             style: ElevatedButton.styleFrom(
-              backgroundColor: tdPurple,
+              backgroundColor: colorScheme.primary,
               minimumSize: const Size.fromHeight(50),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
             ),
-            child: Text("Choose Time".tr(), style: const TextStyle(color: tdText, fontSize: 16)),
+            child: Text("Choose Time".tr(), style: TextStyle(color: colorScheme.onPrimary, fontSize: 16)),
           ),
         ),
       ],
@@ -122,22 +123,23 @@ class _SelectDateDialogState extends State<SelectDateDialog> {
   }
 
   Widget _buildDayCell(
-    DateTime day, {
+    DateTime day,
+    ColorScheme colorScheme, {
     required bool isSelected,
     required bool isToday,
     bool isOutside = false,
   }) {
     final bgColor = isSelected
-        ? tdPurple
+        ? colorScheme.primary
         : isToday
-            ? Colors.white24
-            : const Color(0xFF272727);
+            ? colorScheme.primaryContainer.withOpacity(0.2)
+            : colorScheme.surfaceVariant;
 
     final textColor = isOutside
-        ? Colors.white30
+        ? colorScheme.onSurface.withOpacity(0.3)
         : isSelected
-            ? tdText
-            : Colors.white;
+            ? colorScheme.onPrimary
+            : colorScheme.onSurface;
 
     return Center(
       child: Container(

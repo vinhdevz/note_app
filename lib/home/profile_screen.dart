@@ -106,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _showImageSourceSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.grey[900],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -116,37 +116,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Change account image'.tr(),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: tdWhite,
-                ),
-              ),
+             Text(
+  'Change account image'.tr(),
+  style: TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: Theme.of(context).colorScheme.onSurface,
+  ),
+),
+
               const SizedBox(height: 16),
               ListTile(
-                leading: const Icon(Icons.camera_alt, color: tdWhite),
+                leading: Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.onSurface,),
                 title: Text('Take picture'.tr(),
-                    style: const TextStyle(color: tdWhite)),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(ImageSource.camera);
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.photo_library, color: tdWhite),
+                leading: Icon(Icons.photo_library, color:Theme.of(context).colorScheme.onSurface,),
                 title: Text('Import from gallery'.tr(),
-                    style: const TextStyle(color: tdWhite)),
+                    style: TextStyle(color:Theme.of(context).colorScheme.onSurface,)),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(ImageSource.gallery);
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.drive_folder_upload, color: tdWhite),
+                leading: Icon(Icons.drive_folder_upload, color: Theme.of(context).colorScheme.onSurface,),
                 title: Text('Import from Google Drive'.tr(),
-                    style: const TextStyle(color: tdWhite)),
+                    style: TextStyle(color:Theme.of(context).colorScheme.onSurface,)),
                 onTap: () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -175,19 +176,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: tdBgColor,
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: tdBgColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
         elevation: 0,
         title: Text(
           'Profile'.tr(),
-          style: const TextStyle(
-            color: tdText,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Lato',
-          ),
+         style: TextStyle(
+  color: Theme.of(context).colorScheme.onSurface,
+  fontSize: 20,
+  fontWeight: FontWeight.bold,
+  fontFamily: 'Lato',
+),
+
         ),
         centerTitle: true,
       ),
@@ -203,7 +207,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: () => _showImageSourceSheet(context),
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundColor: Colors.grey[300],
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+
                       backgroundImage: _getProfileImage(),
                       child: _getProfileImage() == null
                           ? const Icon(Icons.person,
@@ -212,15 +217,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    _fullname,
-                    style: const TextStyle(
-                      color: tdWhite,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Lato',
-                    ),
-                  ),
+                Text(
+  _fullname,
+  style: TextStyle(
+    color: Theme.of(context).colorScheme.onSurface,
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    fontFamily: 'Lato',
+  ),
+),
+
                   const SizedBox(height: 20),
                   TaskStats(
                     uncompletedCount: _uncompletedCount,
@@ -377,18 +383,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: Colors.grey[900],
+       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text(
           'Change full name'.tr(),
           style:
-              const TextStyle(color: tdWhite, fontSize: 18, fontFamily: 'Lato'),
+               TextStyle(color:Theme.of(context).colorScheme.onSurface, fontSize: 18, fontFamily: 'Lato'),
         ),
         content: TextField(
           controller: nameController,
-          style: const TextStyle(color: tdWhite, fontFamily: 'Lato'),
+          style: TextStyle(color:Theme.of(context).colorScheme.onSurface, fontFamily: 'Lato'),
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.grey[800],
+            fillColor: Theme.of(context).focusColor,
             hintText: 'Enter new full name'.tr(),
             hintStyle: const TextStyle(color: Colors.grey, fontFamily: 'Lato'),
             border: OutlineInputBorder(
@@ -401,7 +407,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text('Cancel'.tr(),
-                style: const TextStyle(color: tdWhite, fontSize: 16)),
+                style: TextStyle(color:Theme.of(context).colorScheme.onSurface, fontSize: 16)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -416,12 +422,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
+              backgroundColor:Theme.of(context).colorScheme.secondary,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6)),
             ),
             child: Text('Edit'.tr(),
-                style: const TextStyle(color: tdWhite, fontSize: 16)),
+                style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 16)),
           ),
         ],
       ),
@@ -435,9 +441,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: Colors.grey[900],
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text('Change account Password'.tr(),
-            style: const TextStyle(color: tdWhite, fontSize: 18)),
+            style: TextStyle(color:Theme.of(context).colorScheme.onSurface,fontSize: 18)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -445,14 +451,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 oldPasswordController, 'Enter old password'.tr()),
             const SizedBox(height: 12),
             _buildPasswordField(
-                newPasswordController, 'Enter new password'.tr()),
+                newPasswordController, 'Enter new password'.tr(), 
+               ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text('Cancel'.tr(),
-                style: const TextStyle(color: tdWhite, fontSize: 16)),
+                style: TextStyle(color:Theme.of(context).colorScheme.onSurface, fontSize: 16)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -486,12 +493,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: tdDarkPurple,
+              backgroundColor:Theme.of(context).colorScheme.secondary,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6)),
             ),
             child: Text('Edit'.tr(),
-                style: const TextStyle(color: tdWhite, fontSize: 16)),
+                style: TextStyle(color:Theme.of(context).colorScheme.onPrimary, fontSize: 16)),
           ),
         ],
       ),
@@ -502,7 +509,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return TextFormField(
       controller: controller,
       obscureText: true,
-      style: const TextStyle(color: tdWhite),
+      style:  TextStyle(color:Theme.of(context).colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: label,
         floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -559,13 +566,13 @@ class StatBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.grey[800],
+        color: Theme.of(context).focusColor,
         borderRadius: BorderRadius.circular(2),
       ),
       child: Text(
         text,
         style:
-            const TextStyle(color: tdWhite, fontSize: 14, fontFamily: 'Lato'),
+             TextStyle( color: Theme.of(context).colorScheme.onSurface, fontSize: 14, fontFamily: 'Lato'),
       ),
     );
   }
@@ -586,13 +593,13 @@ class ProfileOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: SvgPicture.asset(iconPath, width: 24, height: 24),
+      leading: SvgPicture.asset(iconPath, width: 24, height: 24, color: Theme.of(context).colorScheme.onSurface),
       title: Text(
         title,
         style:
-            const TextStyle(color: tdWhite, fontSize: 16, fontFamily: 'Lato'),
+            TextStyle( color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontFamily: 'Lato'),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, color: tdWhite, size: 16),
+      trailing: Icon(Icons.arrow_forward_ios, color: Theme.of(context).colorScheme.onSurface, size: 16),
       onTap: onTap,
     );
   }
@@ -609,8 +616,8 @@ class SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
       child: Text(
         title,
-        style: const TextStyle(
-          color: tdWhite,
+        style: TextStyle(
+           color: Theme.of(context).colorScheme.onSurface,
           fontSize: 14,
           fontWeight: FontWeight.w400,
           fontFamily: 'Lato',

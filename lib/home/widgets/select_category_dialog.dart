@@ -39,10 +39,7 @@ class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
   }
 
   Future<void> _removeCategory(int? id) async {
-    if (id == null) {
-      debugPrint('Category không tồn tại hoặc chưa có id');
-      return;
-    }
+    if (id == null) return;
     await TaskDatabase.instance.deleteCategory(id);
     await _loadCategories();
     if (_selectedCategoryId == id) {
@@ -52,10 +49,7 @@ class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
   }
 
   Future<void> _editCategory(CategoryModel category) async {
-    if (category.id == null) {
-      debugPrint('Category không tồn tại để sửa');
-      return;
-    }
+    if (category.id == null) return;
     final result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(builder: (_) => CreateCategoryScreen(category: category)),
@@ -87,7 +81,6 @@ class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
 
     if (confirm == true) {
       await _removeCategory(category.id);
-     
     }
   }
 
@@ -108,10 +101,12 @@ class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final categoryItems = [...categories, _createNewCategory()];
 
     return Dialog(
-      backgroundColor: tdGrey,
+      backgroundColor: colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Padding(
@@ -119,11 +114,11 @@ class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTitle(),
+            _buildTitle(colorScheme),
             const SizedBox(height: 10),
-            _buildCategoryGrid(categoryItems),
+            _buildCategoryGrid(categoryItems, colorScheme),
             const SizedBox(height: 20),
-            _buildSaveButton(),
+            _buildSaveButton(colorScheme),
           ],
         ),
       ),
@@ -132,30 +127,30 @@ class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
 
   CategoryModel _createNewCategory() {
     return CategoryModel(
-      id: -1, // Sử dụng ID đặc biệt cho mục "Tạo mới"
+      id: -1,
       label: 'Create New'.tr(),
       icon: 'assets/icons/add.svg',
       color: 0xff80FFD1,
     );
   }
 
-  Widget _buildTitle() {
+  Widget _buildTitle(ColorScheme colorScheme) {
     return Column(
       children: [
         Text(
           'Choose Category'.tr(),
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const Divider(color: tdText),
+        Divider(color: colorScheme.outline),
       ],
     );
   }
 
-  Widget _buildCategoryGrid(List<CategoryModel> items) {
+  Widget _buildCategoryGrid(List<CategoryModel> items, ColorScheme colorScheme) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -173,36 +168,32 @@ class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
             label: category.label,
             iconPath: category.icon,
             bgColor: Color(category.color),
+            textColor: colorScheme.onSurface,
           );
         }
         final isSelected = _selectedCategoryId == category.id;
-        return _buildCategoryItem(category: category, isSelected: isSelected);
+        return _buildCategoryItem(category, isSelected, colorScheme);
       },
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(ColorScheme colorScheme) {
     return SizedBox(
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
         onPressed: _handleSave,
         style: ElevatedButton.styleFrom(
-          backgroundColor: tdPurple,
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         ),
-        child: Text(
-          "Add Category".tr(),
-          style: const TextStyle(color: Colors.white, fontSize: 16),
-        ),
+        child: Text("Add Category".tr(), style: const TextStyle(fontSize: 16)),
       ),
     );
   }
 
-  Widget _buildCategoryItem({
-    required CategoryModel category,
-    required bool isSelected,
-  }) {
+  Widget _buildCategoryItem(CategoryModel category, bool isSelected, ColorScheme colorScheme) {
     return GestureDetector(
       onTap: () => setState(() => _selectedCategoryId = category.id),
       child: Column(
@@ -217,7 +208,7 @@ class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
             ],
           ),
           const SizedBox(height: 6),
-          _categoryLabel(category),
+          _categoryLabel(category, colorScheme),
         ],
       ),
     );
@@ -265,12 +256,12 @@ class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
     );
   }
 
-  Widget _categoryLabel(CategoryModel category) {
+  Widget _categoryLabel(CategoryModel category, ColorScheme colorScheme) {
     return SizedBox(
       width: 60,
       child: Text(
         category.label,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: colorScheme.onSurface),
         textAlign: TextAlign.center,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
@@ -282,6 +273,7 @@ class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
     required String label,
     required String iconPath,
     required Color bgColor,
+    required Color textColor,
   }) {
     return GestureDetector(
       onTap: _onCreateNewCategory,
@@ -304,7 +296,7 @@ class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
             ),
           ),
           const SizedBox(height: 6),
-          Text(label, style: const TextStyle(color: Colors.white)),
+          Text(label, style: TextStyle(color: textColor)),
         ],
       ),
     );
@@ -317,8 +309,8 @@ class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
     );
     if (result == true) {
       await _loadCategories();
-     widget.onCategoryUpdated?.call();} 
-    
+      widget.onCategoryUpdated?.call();
+    }
   }
 
   Widget _circleIcon(IconData icon, Color color, VoidCallback onTap) {
