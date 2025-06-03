@@ -9,7 +9,9 @@ import 'package:flutter_todo_app/home/help_feed_back_screen.dart';
 import 'package:flutter_todo_app/home/setting_screen.dart';
 import 'package:flutter_todo_app/database/task_database.dart';
 import 'package:flutter_todo_app/home/support_us_screen.dart';
+import 'package:flutter_todo_app/provider/theme_provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import '../database/user_db.dart';
 import 'dart:developer' as developer;
 
@@ -364,11 +366,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextButton(
             onPressed: () async {
               await UserDatabase.instance.clearLoginState();
+                final themeNotifier = context.read<ThemeNotifier>();
+    themeNotifier.toggleTheme(false); 
               Navigator.of(context).pop();
               widget.onLogout();
-              Navigator.of(context)
-                  .pushNamedAndRemoveUntil('/intro', (route) => false);
-            },
+              Navigator.of(context).pushNamedAndRemoveUntil('/intro', (route) => false);
+  },
             child: Text('Clear & restart'.tr(),
                 style: const TextStyle(color: Colors.red)),
           ),
@@ -506,31 +509,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildPasswordField(TextEditingController controller, String label) {
-    return TextFormField(
-      controller: controller,
-      obscureText: true,
-      style:  TextStyle(color:Theme.of(context).colorScheme.onSurface),
-      decoration: InputDecoration(
-        labelText: label,
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        labelStyle: const TextStyle(color: Colors.grey),
-        filled: true,
-        fillColor: Colors.grey[850],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: Colors.grey),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: Colors.grey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: tdDarkPurple),
-        ),
+  return TextFormField(
+    controller: controller,
+    obscureText: true,
+    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+    cursorColor: Theme.of(context).colorScheme.primary,
+    decoration: InputDecoration(
+      labelText: label,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      labelStyle: TextStyle(color: Theme.of(context).hintColor),
+      filled: true,
+      fillColor: Theme.of(context).inputDecorationTheme.fillColor ??
+                Theme.of(context).colorScheme.surfaceVariant,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: BorderSide(color: Theme.of(context).dividerColor),
       ),
-    );
-  }
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: BorderSide(color: Theme.of(context).dividerColor),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+      ),
+    ),
+  );
+}
+
 }
 
 class TaskStats extends StatelessWidget {
